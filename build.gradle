@@ -1,0 +1,33 @@
+group 'org.urllib'
+version '0.1.0-SNAPSHOT'
+
+apply plugin: 'java-library'
+
+apply from: 'maven-central.gradle'
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+configurations {
+    apt
+}
+
+sourceCompatibility = JAVA_VERSION
+targetCompatibility = JAVA_VERSION
+
+dependencies {
+    api 'com.google.code.findbugs:jsr305:3.0.2'
+    compileOnly 'com.google.auto.value:auto-value:1.5'
+    apt         'com.google.auto.value:auto-value:1.5'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.google.guava:guava:23.1-jre'
+}
+
+compileJava {
+    options.annotationProcessorPath = configurations.apt
+}
