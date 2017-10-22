@@ -2,19 +2,19 @@ package org.urllib.internal;
 
 import com.google.auto.value.AutoValue;
 import java.util.Locale;
-import java.util.Optional;
+import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class SplitUrl {
 
   private static final CodepointMatcher slash = CodepointMatcher.or('/', '\\');
 
-  public abstract Optional<String> scheme();
-  public abstract Optional<String> authority();
-  public abstract Optional<String> path();
-  public abstract Optional<String> query();
-  public abstract Optional<String> fragment();
-  public abstract Type urlType();
+  @Nullable public abstract String scheme();
+  @Nullable public abstract String authority();
+  @Nullable public abstract String path();
+  @Nullable public abstract String query();
+  @Nullable public abstract String fragment();
+  @Nullable public abstract Type urlType();
 
   public static SplitUrl split(String url) {
 

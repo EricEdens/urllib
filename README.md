@@ -3,7 +3,7 @@
 Urllib is a library that makes URL manipulation easy, fun, and safe!
 
 - [x] Zero extra dependencies.
-- [x] Supports Java 8+.
+- [x] Supports Java 7+, Android 14+.
 - [x] Compliant with [RFC 3986](https://tools.ietf.org/html/rfc3986).
 - [x] Immutable and threadsafe.
 

@@ -4,7 +4,6 @@ import com.google.auto.value.AutoValue;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringJoiner;
 import org.urllib.UrlException;
 
 @AutoValue
@@ -25,7 +24,7 @@ public abstract class Authority {
     int lastColon = -1;
     int numColons = 0;
 
-    int[] points = authority.codePoints().toArray();
+    int[] points = Strings.codePoints(authority);
     int p = points.length;
     int end = points.length;
     int port = -1;
@@ -113,18 +112,16 @@ public abstract class Authority {
   }
 
   private static String validateAndFormatDns(List<String> segments) {
-    StringJoiner joiner = new StringJoiner(".");
     for (Iterator<String> iterator = segments.iterator(); iterator.hasNext(); ) {
       String segment = iterator.next();
       assert !segment.isEmpty() : "Internal bug: segments should not be empty. State=" + segment;
-      joiner.add(segment);
       if (!iterator.hasNext()) {
         if (CodepointMatcher.DIGIT.matches(segment.charAt(0))) {
           throw new UrlException("Last segment in host name cannot start with a digit.");
         }
       }
     }
-    return joiner.toString();
+    return Joiner.on('.').join(segments);
   }
 
   private static int parseAndValidatePort(int[] points, int lastColon) {

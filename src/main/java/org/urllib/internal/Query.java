@@ -4,7 +4,7 @@ import com.google.auto.value.AutoValue;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
+import java.util.Map.Entry;
 import javax.annotation.Nullable;
 
 public class Query {
@@ -16,16 +16,19 @@ public class Query {
   }
 
   public String encoded() {
-    StringJoiner joiner = new StringJoiner("&");
-    for (KeyValue param : params) {
-      joiner.add(param.encoded());
+    Joiner joiner = Joiner.on('&');
+    String[] encodedPairs = new String[params.size()];
+    for (int i = 0; i < params.size(); i++) {
+      encodedPairs[i] = params.get(i).encoded();
     }
-    return joiner.toString();
+    return joiner.join(encodedPairs);
   }
 
   public static Query create(Map<String, String> paramMap) {
     Query query = new Query();
-    paramMap.forEach((key, val) -> query.params.add(KeyValue.create(key, val)));
+    for (Entry<String, String> param : paramMap.entrySet()) {
+      query.params.add(KeyValue.create(param.getKey(), param.getValue()));
+    }
     return query;
   }
 
@@ -41,7 +44,7 @@ public class Query {
 
     public String encoded() {
 
-      if (value() == null || value().isEmpty()) {
+      if (Strings.isNullOrEmpty(value())) {
         return PercentEncoder.encodeQueryComponentNoPlusForSpace(key());
       } else {
         return PercentEncoder.encodeQueryComponentNoPlusForSpace(key())

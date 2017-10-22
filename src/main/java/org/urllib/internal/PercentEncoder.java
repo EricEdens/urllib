@@ -46,7 +46,7 @@ public abstract class PercentEncoder {
       return src;
     }
     int p = 0;
-    int[] codepoints = src.codePoints().toArray();
+    int[] codepoints = Strings.codePoints(src);
     int[] dest = new int[maxEncodedSize(codepoints, safe)];
     for (int codepoint : codepoints) {
       if (spaceToPlus && codepoint == ' ') {

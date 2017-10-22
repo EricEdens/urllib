@@ -38,7 +38,6 @@ public class UrlTest {
             .path("input/")
             .query(Collections.singletonMap("i", "π²"))
             .toString());
-
   }
 
   @Test

@@ -80,7 +80,7 @@ public abstract class CodepointMatcher {
 
   public static final CodepointMatcher ALPHANUMERIC = or(ALPHA, DIGIT);
 
-  public static CodepointMatcher or(CodepointMatcher one, CodepointMatcher two) {
+  public static CodepointMatcher or(final CodepointMatcher one, final CodepointMatcher two) {
     return new CodepointMatcher() {
       @Override public boolean matches(int codepoint) {
         return one.matches(codepoint) || two.matches(codepoint);
@@ -88,11 +88,11 @@ public abstract class CodepointMatcher {
     };
   }
 
-  public static final CodepointMatcher anyOf(String str) {
-    return anyOf(str.codePoints().toArray());
+  public static CodepointMatcher anyOf(String str) {
+    return anyOf(Strings.codePoints(str));
   }
 
-  public static final CodepointMatcher anyOf(int... codepoints) {
+  public static CodepointMatcher anyOf(final int... codepoints) {
     Arrays.sort(codepoints);
     return new CodepointMatcher() {
       @Override public boolean matches(int codepoint) {
@@ -101,16 +101,23 @@ public abstract class CodepointMatcher {
     };
   }
 
-  public static CodepointMatcher or(char c1, char c2) {
+  public static CodepointMatcher or(final char c1, final char c2) {
     return new CodepointMatcher() {
       @Override public boolean matches(int codepoint) {
-        return codepoint == c1 || codepoint == c2;
+        return (codepoint == c1) || (codepoint == c2);
       }
     };
   }
 
   public boolean matchesAnyOf(String str) {
-    return str.codePoints().anyMatch(this::matches);
+    for (int stringPointer = 0; stringPointer < str.length(); ) {
+      int codepoint = str.codePointAt(stringPointer);
+      if (matches(codepoint)) {
+        return true;
+      }
+      stringPointer += Character.charCount(codepoint);
+    }
+    return false;
   }
 
 }

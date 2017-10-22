@@ -1,7 +1,5 @@
 package org.urllib.internal;
 
-import java.nio.charset.StandardCharsets;
-
 public class PercentDecoder {
 
   public static String decode(String str, CodepointMatcher decodeSet) {

@@ -1,10 +1,10 @@
 package org.urllib.internal;
 
 import com.google.auto.value.AutoValue;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 @AutoValue
@@ -14,7 +14,7 @@ public abstract class Path {
   private static final Pattern SINGLE_DOT = Pattern.compile("^\\.|%2[eE]$");
   private static final Pattern DOUBLE_DOT = Pattern.compile("^(\\.|%2[eE]){2}$");
 
-  private static final Path EMPTY = of(Collections.emptyList(), true);
+  private static final Path EMPTY = of(Collections.<String>emptyList(), true);
 
   public abstract List<String> segments();
   public abstract boolean isDir();
@@ -63,9 +63,12 @@ public abstract class Path {
     if (segments.isEmpty()) {
       display = "/";
     } else {
-      StringJoiner joiner = new StringJoiner("/", "/", isDir ? "/" : "");
-      segments.forEach(segment -> joiner.add(PercentEncoder.encodePathSegment(segment)));
-      display = joiner.toString();
+      Joiner joiner = Joiner.on("/", "/", isDir ? "/" : "");
+      String[] encodedSegments = new String[segments.size()];
+      for (int i = 0; i < segments.size(); i++) {
+        encodedSegments[i] = PercentEncoder.encodePathSegment(segments.get(i));
+      }
+      display = joiner.join(encodedSegments);
     }
     return display;
   }
