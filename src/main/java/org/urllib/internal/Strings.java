@@ -26,4 +26,8 @@ public final class Strings {
   public static boolean isNullOrEmpty(String s) {
     return s == null || s.isEmpty();
   }
+
+  public static String emptyToNull(String s) {
+    return s == null ? "" : s;
+  }
 }

@@ -7,8 +7,34 @@ import org.junit.Test;
 
 public class UrlTest {
 
-  @Test
-  public void builderFullUrl() {
+  @Test public void onlyPath() {
+    Url url = Url.http("host").create();
+    assertEquals("http://host/", url.percentEncoded());
+
+    url = Url.http("host").path("").create();
+    assertEquals("http://host/", url.percentEncoded());
+
+    url = Url.http("host").path("/").create();
+    assertEquals("http://host/", url.percentEncoded());
+  }
+
+  @Test public void onlyQuery() {
+    Url url = Url.http("host").query("key", "val").create();
+    assertEquals("http://host/?key=val", url.percentEncoded());
+
+    url = Url.http("host").query("key", "").create();
+    assertEquals("http://host/?key", url.percentEncoded());
+  }
+
+  @Test public void onlyFragment() {
+    Url url = Url.http("host").fragment("fragment").create();
+    assertEquals("http://host/#fragment", url.percentEncoded());
+
+    url = Url.http("host").fragment("").create();
+    assertEquals("http://host/", url.percentEncoded());
+  }
+
+  @Test public void builderFullUrl() {
     assertEquals("http://localhost:8080/files/pdf/report.pdf?user=8123#Reports",
         Url.http("localhost:8080")
             .path("/files/pdf/", "report.pdf")
@@ -40,8 +66,52 @@ public class UrlTest {
             .toString());
   }
 
-  @Test
-  public void allowPortWithHost() {
+  @Test public void scheme() {
+    Url url = Url.http("host").create();
+    assertEquals(Scheme.HTTP, url.scheme());
+
+    url = Url.https("host").create();
+    assertEquals(Scheme.HTTPS, url.scheme());
+  }
+
+  @Test public void host() {
+    Url url = Url.http("host").create();
+    assertEquals("host", url.host().toString());
+  }
+
+  @Test public void host_removesUserInfo() {
+    Url url = Url.http("user:password@host.com").create();
+    assertEquals("host.com", url.host().toString());
+
+    url = Url.http("user@domain.com:password@host.com").create();
+    assertEquals("host.com", url.host().toString());
+  }
+
+  @Test public void port() {
+    Url url = Url.http("host").create();
+    assertEquals(80, url.port());
+
+    url = Url.http("host:443").create();
+    assertEquals(443, url.port());
+
+    url = Url.http("host").port(8080).create();
+    assertEquals(8080, url.port());
+
+    url = Url.https("host").create();
+    assertEquals(443, url.port());
+
+    url = Url.https("host:80").create();
+    assertEquals(80, url.port());
+  }
+
+  @Test public void fragment() {
+    Url url = Url.http("host")
+        .fragment("\uD83D\uDC36")
+        .create();
+    assertEquals("\uD83D\uDC36", url.fragment().toString());
+  }
+
+  @Test public void allowPortWithHost() {
     assertEquals("http://localhost:8080/", Url.http("localhost:8080").toString());
     assertEquals("http://localhost/", Url.http("localhost:80").toString());
   }

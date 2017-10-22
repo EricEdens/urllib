@@ -4,7 +4,9 @@ import com.google.auto.value.AutoValue;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.urllib.Host;
 import org.urllib.UrlException;
+import org.urllib.internal.host.AsciiDns;
 
 @AutoValue
 public abstract class Authority {
@@ -17,7 +19,7 @@ public abstract class Authority {
       CodepointMatcher.or(CodepointMatcher.ALPHANUMERIC, CodepointMatcher.anyOf("-"));
 
   public abstract int port();
-  public abstract String host();
+  public abstract Host host();
   public abstract List<String> hostSegments();
 
   public static Authority split(String authority) {
@@ -97,18 +99,11 @@ public abstract class Authority {
       segments.add(new String(points, lastSegment, end - lastSegment));
     }
 
-    String hostString;
     if (maybeIpv4) {
-      hostString = validateAndFormatIpv4(segments);
+      throw new UnsupportedOperationException("Ipv4 addresses not supported yet.");
     } else {
-      hostString = validateAndFormatDns(segments);
+      return asciiDns(validateAndFormatDns(segments), port, segments);
     }
-
-    return new AutoValue_Authority(port, hostString, segments);
-  }
-
-  private static String validateAndFormatIpv4(List<String> segments) {
-    throw new UnsupportedOperationException("Ipv4 addresses not supported yet.");
   }
 
   private static String validateAndFormatDns(List<String> segments) {
@@ -136,7 +131,7 @@ public abstract class Authority {
     return Port.validateOrThrow(portString);
   }
 
-  public static Authority of(String authority, int port, List<String> hostSegments) {
-    return new AutoValue_Authority(port, authority, hostSegments);
+  public static Authority asciiDns(String authority, int port, List<String> hostSegments) {
+    return new AutoValue_Authority(port, AsciiDns.create(authority), hostSegments);
   }
 }

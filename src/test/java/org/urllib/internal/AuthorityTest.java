@@ -15,19 +15,19 @@ public class AuthorityTest {
   @Test public void removeUpToOneTrailingDotInHost_dns() {
 
     assertEquals(
-        Authority.of("host", -1, Arrays.asList("host")),
+        Authority.asciiDns("host", -1, Arrays.asList("host")),
         Authority.split("host"));
 
     assertEquals(
-        Authority.of("host", -1, Arrays.asList("host")),
+        Authority.asciiDns("host", -1, Arrays.asList("host")),
         Authority.split("host."));
 
     assertEquals(
-        Authority.of("host.com", -1, Arrays.asList("host", "com")),
+        Authority.asciiDns("host.com", -1, Arrays.asList("host", "com")),
         Authority.split("host.com"));
 
     assertEquals(
-        Authority.of("host.com", -1, Arrays.asList("host", "com")),
+        Authority.asciiDns("host.com", -1, Arrays.asList("host", "com")),
         Authority.split("host.com."));
 
   }
@@ -35,18 +35,18 @@ public class AuthorityTest {
   @Ignore("IPv4 addresses not supported yet.")
   @Test public void removeUpToOneTrailingDotInHost_ipv4() {
     assertEquals(
-        Authority.of("192.168.1.1", -1, Arrays.asList("192", "168", "1", "1")),
+        Authority.asciiDns("192.168.1.1", -1, Arrays.asList("192", "168", "1", "1")),
         Authority.split("192.168.1.1"));
 
     assertEquals(
-        Authority.of("192.168.1.1", -1, Arrays.asList("192", "168", "1", "1")),
+        Authority.asciiDns("192.168.1.1", -1, Arrays.asList("192", "168", "1", "1")),
         Authority.split("192.168.1.1."));
   }
 
   @Test public void supportUnicodePeriods() {
-    assertEquals("host.com", Authority.split("host。com").host());
-    assertEquals("host.com", Authority.split("host．com").host());
-    assertEquals("host.com", Authority.split("host｡com").host());
+    assertEquals("host.com", Authority.split("host。com").host().toString());
+    assertEquals("host.com", Authority.split("host．com").host().toString());
+    assertEquals("host.com", Authority.split("host｡com").host().toString());
   }
 
   @Test public void ipAddressesNotSupportedYet() {
@@ -64,9 +64,9 @@ public class AuthorityTest {
   }
 
   @Test public void removeUserInfo() {
-    assertEquals("host.com", Authority.split("user@host.com").host());
-    assertEquals("host.com", Authority.split("user@host.com@host.com").host());
-    assertEquals("host.com", Authority.split("user@host.com@host.com:80").host());
+    assertEquals("host.com", Authority.split("user@host.com").host().toString());
+    assertEquals("host.com", Authority.split("user@host.com@host.com").host().toString());
+    assertEquals("host.com", Authority.split("user@host.com@host.com:80").host().toString());
   }
 
   @Test public void rejectInvalidPorts() {

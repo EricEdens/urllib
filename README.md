@@ -18,7 +18,7 @@ once we reach 1.0.
   - Create a `Url` from scratch with builders.
   - Interop with `java.net.URI`
   - Support ASCII DNS hosts.
-- [ ] 0.2
+- [x] 0.2
   - Expose component fields (scheme, host, path, etc..) via methods on the `Url` object.
 - [ ] 0.3
   - Support IPv4 hosts.

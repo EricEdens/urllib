@@ -5,12 +5,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import org.urllib.internal.Authority;
-import org.urllib.internal.Path;
-import org.urllib.internal.PercentEncoder;
 import org.urllib.internal.Port;
-import org.urllib.internal.Query;
-import org.urllib.internal.Scheme;
 
 /**
  * A <a href="https://en.wikipedia.org/wiki/URL">uniform resource locator (Url)</a> that is
@@ -35,8 +33,8 @@ import org.urllib.internal.Scheme;
  *
  * <h3>java.net.URI</h3>
  *
- * <p>Java's {@link URI} is a minefield of hostile constructors, unclear encoding
- * rules, and surprise exceptions. If you need a {@link URI}, Urllib has you covered:<pre>{@code
+ * <p>Java's {@link URI} is tough to navigate. If you need a {@link URI}, Urllib has you covered:
+ * <pre>{@code
  *
  *   URI moliere = Url.http("wikipedia.org")
  *                    .path("wiki", "Molière")
@@ -50,9 +48,21 @@ import org.urllib.internal.Scheme;
  */
 public final class Url {
 
+  private final Scheme scheme;
+  private final int port;
+  private final Authority authority;
+  private final Path path;
+  private final Query query;
+  private final Fragment fragment;
   private final String encoded;
 
   private Url(Builder builder) {
+    this.scheme = builder.scheme;
+    this.authority = builder.authority;
+    this.port = builder.port;
+    this.path = builder.path;
+    this.query = builder.query;
+    this.fragment = builder.fragment;
     this.encoded = builder.toString();
   }
 
@@ -71,10 +81,64 @@ public final class Url {
   }
 
   /**
+   * Returns the Url's scheme.
+   *
+   * @see <a href="https://tools.ietf.org/html/rfc3986#section-3.1">RFC 3986#3.1</a>
+   */
+  @Nonnull public Scheme scheme() {
+    return scheme;
+  }
+
+  /**
+   * Returns the Url's host.
+   *
+   * @see <a href="https://tools.ietf.org/html/rfc3986#section-3.2.2">RFC 3986#3.2.2</a>
+   */
+  @Nonnull public Host host() {
+    return authority.host();
+  }
+
+  /**
+   * Returns the Url's port.
+   *
+   * @see <a href="https://tools.ietf.org/html/rfc3986#section-3.2.3">RFC 3986#3.2.3</a>
+   */
+  @Nonnegative public int port() {
+    return port;
+  }
+
+  /**
+   * Returns the Url's query.
+   *
+   * @see <a href="https://tools.ietf.org/html/rfc3986#section-3.3">RFC 3986#3.3</a>
+   */
+  @Nonnull public Path path() {
+    return path;
+  }
+
+  /**
+   * Returns the Url's query.
+   *
+   * @see <a href="https://tools.ietf.org/html/rfc3986#section-3.4">RFC 3986#3.4</a>
+   */
+  @Nonnull public Query query() {
+    return query;
+  }
+
+  /**
+   * Returns the Url's fragment, not encoded.
+   *
+   * @see <a href="https://tools.ietf.org/html/rfc3986#section-3.5">RFC 3986#3.5</a>
+   */
+  @Nonnull public Fragment fragment() {
+    return fragment;
+  }
+
+  /**
    * Re-assemble the Url with an encoding that is compliant with
    * <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a>.
    */
-  @Override public String toString() {
+  public String percentEncoded() {
     return encoded;
   }
 
@@ -84,8 +148,8 @@ public final class Url {
     private int port;
     private Authority authority;
     private Path path = Path.empty();
-    private Query query;
-    private String fragment;
+    private Query query = Query.empty();
+    private Fragment fragment = Fragment.empty();
 
     private Builder() {}
 
@@ -108,7 +172,7 @@ public final class Url {
     }
 
     public Builder path(String... splittableSegments) {
-      this.path = Path.split(splittableSegments);
+      this.path = Path.of(splittableSegments);
       return this;
     }
 
@@ -123,8 +187,12 @@ public final class Url {
     }
 
     public Builder fragment(String fragment) {
-      this.fragment = fragment;
+      this.fragment = Fragment.of(fragment);
       return this;
+    }
+
+    public Url create() {
+      return new Url(this);
     }
 
     public URI toURI() {
@@ -147,22 +215,17 @@ public final class Url {
         sb.append(':').append(port);
       }
 
-      if (path != null) {
-        sb.append(path.encoded());
-      } else {
-        sb.append('/');
+      sb.append(path.percentEncoded());
+
+      if (!query.isEmpty()) {
+        sb.append('?').append(query.percentEncoded());
       }
 
-      if (query != null) {
-        sb.append('?').append(query.encoded());
-      }
-
-      if (fragment != null) {
-        sb.append('#').append(PercentEncoder.encodeFragment(fragment));
+      if (!fragment.isEmpty()) {
+        sb.append('#').append(fragment.percentEncoded());
       }
 
       return sb.toString();
     }
-
   }
 }

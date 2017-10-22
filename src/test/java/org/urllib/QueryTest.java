@@ -1,4 +1,4 @@
-package org.urllib.internal;
+package org.urllib;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,7 +38,7 @@ public class QueryTest {
   }
 
   private String encoded(String key, String val) {
-    return Query.create(Collections.singletonMap(key, val)).encoded();
+    return Query.create(Collections.singletonMap(key, val)).percentEncoded();
   }
 
 }

@@ -1,40 +1,40 @@
-package org.urllib.internal;
+package org.urllib;
 
-import com.google.auto.value.AutoValue;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import org.urllib.internal.CodepointMatcher;
+import org.urllib.internal.Joiner;
+import org.urllib.internal.PercentEncoder;
 
-@AutoValue
-public abstract class Path {
+public final class Path {
 
+  private static final Joiner DIRECTORY_JOINER = Joiner.on("/", "/", "/");
+  private static final Joiner FILE_JOINER = Joiner.on("/", "/", "");
   private static final CodepointMatcher SLASH_MATCHER = CodepointMatcher.anyOf("/\\");
   private static final Pattern SINGLE_DOT = Pattern.compile("^\\.|%2[eE]$");
   private static final Pattern DOUBLE_DOT = Pattern.compile("^(\\.|%2[eE]){2}$");
+  private static final Path empty = of(Collections.<String>emptyList(), true);
 
-  private static final Path EMPTY = of(Collections.<String>emptyList(), true);
+  @Nonnull private final List<String> segments;
+  private final boolean isDir;
+  @Nonnull private final String encoded;
 
-  public abstract List<String> segments();
-  public abstract boolean isDir();
-  public abstract String encoded();
-
-  public static Path empty() {
-    return EMPTY;
+  Path(@Nonnull List<String> segments, boolean isDir, @Nonnull String encoded) {
+    this.segments = segments;
+    this.isDir = isDir;
+    this.encoded = encoded;
   }
 
-  private static Path of(List<String> segments, boolean isDir) {
-    return new AutoValue_Path(
-        segments,
-        isDir,
-        encode(segments, isDir));
+  static Path empty() {
+    return empty;
   }
 
-  public static Path split(String... segments) {
-
+  static Path of(String... segments) {
     if (segments.length == 0) {
-      return EMPTY;
+      return empty;
     }
 
     PathSegments pathSegments = new PathSegments();
@@ -58,19 +58,64 @@ public abstract class Path {
     return of(pathSegments.toList(), pathSegments.isDir());
   }
 
-  private static String encode(List<String> segments, boolean isDir) {
-    String display;
+  public boolean isEmpty() {
+    return "/".equals(encoded);
+  }
+
+  public List<String> segments() {
+    return segments;
+  }
+
+  public boolean isDirectory() {
+    return isDir;
+  }
+
+  public String percentEncoded() {
+    return encoded;
+  }
+
+  @Nonnull public final String filename() {
+    return isDirectory() ? "" : segments().get(segments().size() - 1);
+  }
+
+  @Override public String toString() {
+    return segments().toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o instanceof Path) {
+      Path that = (Path) o;
+      return this.percentEncoded().equals(that.percentEncoded());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return percentEncoded().hashCode();
+  }
+
+
+  private static Path of(List<String> segments, boolean isDir) {
+    String encoded;
     if (segments.isEmpty()) {
-      display = "/";
+      encoded = "/";
     } else {
-      Joiner joiner = Joiner.on("/", "/", isDir ? "/" : "");
       String[] encodedSegments = new String[segments.size()];
       for (int i = 0; i < segments.size(); i++) {
         encodedSegments[i] = PercentEncoder.encodePathSegment(segments.get(i));
       }
-      display = joiner.join(encodedSegments);
+      encoded = (isDir ? DIRECTORY_JOINER : FILE_JOINER).join(encodedSegments);
     }
-    return display;
+
+    return new Path(
+        segments,
+        isDir,
+        encoded);
   }
 
   private static class PathSegments {
@@ -97,7 +142,7 @@ public abstract class Path {
     }
 
     public List<String> toList() {
-      return segments;
+      return Collections.unmodifiableList(segments);
     }
 
     public boolean isDir() {
