@@ -1,6 +1,9 @@
 package org.urllib;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import org.junit.Test;
@@ -77,6 +80,23 @@ public class UrlTest {
   @Test public void host() {
     Url url = Url.http("host").create();
     assertEquals("host", url.host().toString());
+
+    url = Url.http("10.10.0.1:9000").create();
+    assertEquals("10.10.0.1", url.host().toString());
+  }
+
+  @Test public void host_dontAllowInvalidIpv4() {
+    assertInvalidHost("10.10.0", "Invalid hostname");
+    assertInvalidHost("1.1.1", "Invalid hostname");
+    assertInvalidHost("0xa.0xb.0xc.0xd", "Invalid hostname");
+    assertInvalidHost("3294823", "Invalid hostname");
+    assertInvalidHost("1.1.1.1.1", "Invalid hostname");
+    assertInvalidHost("-1:-1:-1:-1", "Invalid hostname");
+  }
+
+  @Test public void host_dontAllowInvalidDns() {
+    assertInvalidHost("host .com", "Invalid hostname");
+    assertInvalidHost("host_name.com", "Invalid hostname");
   }
 
   @Test public void host_removesUserInfo() {
@@ -116,4 +136,12 @@ public class UrlTest {
     assertEquals("http://localhost/", Url.http("localhost:80").toString());
   }
 
+  private void assertInvalidHost(String host, String msg) {
+    try {
+      Url.http(host);
+      fail("Expected IllegalArgumentException for: " + host);
+    } catch (IllegalArgumentException expected) {
+      assertThat(expected.getMessage(), containsString(msg));
+    }
+  }
 }

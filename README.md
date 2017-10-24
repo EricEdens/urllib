@@ -20,7 +20,7 @@ once we reach 1.0.
   - Support ASCII DNS hosts.
 - [x] 0.2
   - Expose component fields (scheme, host, path, etc..) via methods on the `Url` object.
-- [ ] 0.3
+- [x] 0.3
   - Support IPv4 hosts.
 - [ ] 0.4
   - Support IPv6 hosts.

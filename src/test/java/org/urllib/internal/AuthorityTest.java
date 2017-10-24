@@ -5,56 +5,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.urllib.UrlException;
 
 public class AuthorityTest {
 
-  @Test public void removeUpToOneTrailingDotInHost_dns() {
-
-    assertEquals(
-        Authority.asciiDns("host", -1, Arrays.asList("host")),
-        Authority.split("host"));
-
-    assertEquals(
-        Authority.asciiDns("host", -1, Arrays.asList("host")),
-        Authority.split("host."));
-
-    assertEquals(
-        Authority.asciiDns("host.com", -1, Arrays.asList("host", "com")),
-        Authority.split("host.com"));
-
-    assertEquals(
-        Authority.asciiDns("host.com", -1, Arrays.asList("host", "com")),
-        Authority.split("host.com."));
-
+  @Test public void ipv4() {
+    assertEquals("1.1.1.1",
+        Authority.split("1.1.1.1").host().name());
+    assertEquals("192.168.1.1",
+        Authority.split("user:password@192.168.1.1").host().name());
   }
 
-  @Ignore("IPv4 addresses not supported yet.")
-  @Test public void removeUpToOneTrailingDotInHost_ipv4() {
-    assertEquals(
-        Authority.asciiDns("192.168.1.1", -1, Arrays.asList("192", "168", "1", "1")),
-        Authority.split("192.168.1.1"));
-
-    assertEquals(
-        Authority.asciiDns("192.168.1.1", -1, Arrays.asList("192", "168", "1", "1")),
-        Authority.split("192.168.1.1."));
+  @Test public void ipv4_removeUpToOneTrailingDotInHost() {
+    assertEquals("192.168.1.1",
+        Authority.split("192.168.1.1.").host().name());
   }
 
   @Test public void supportUnicodePeriods() {
     assertEquals("host.com", Authority.split("host。com").host().toString());
     assertEquals("host.com", Authority.split("host．com").host().toString());
     assertEquals("host.com", Authority.split("host｡com").host().toString());
-  }
-
-  @Test public void ipAddressesNotSupportedYet() {
-    expectUnsupportedOperationException("8.8.8.8");
-    expectUnsupportedOperationException("8.8.8.8:80");
-    expectUnsupportedOperationException("user@host.com@8.8.8.8");
-    expectUnsupportedOperationException("aa:bb::d");
-    expectUnsupportedOperationException("[aa:bb:c]:9999");
   }
 
   @Test public void failWhenHostIsEmpty() {
@@ -85,14 +56,6 @@ public class AuthorityTest {
   @Test public void defaultPortIsMinusOne() {
     assertEquals(-1, Authority.split("h").port());
     assertEquals(-1, Authority.split("h:").port());
-  }
-
-  private void expectUnsupportedOperationException(String str) {
-    try {
-      Authority authority = Authority.split(str);
-      fail("Expected UnsupportedOperationException; result was: " + authority);
-    } catch (UnsupportedOperationException expected) {
-    }
   }
 
   private void expectUrlException(String str, String msg) {

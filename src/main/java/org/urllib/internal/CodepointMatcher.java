@@ -78,6 +78,14 @@ public abstract class CodepointMatcher {
     }
   };
 
+  public static final CodepointMatcher HEX = new CodepointMatcher() {
+    @Override public boolean matches(int codepoint) {
+      return codepoint >= '0' && codepoint <= '9'
+          || codepoint >= 'a' && codepoint <= 'f'
+          || codepoint >= 'A' && codepoint <= 'F';
+    }
+  };
+
   public static final CodepointMatcher ALPHANUMERIC = or(ALPHA, DIGIT);
 
   public static CodepointMatcher or(final CodepointMatcher one, final CodepointMatcher two) {
