@@ -138,8 +138,19 @@ public final class Url {
    * Re-assemble the Url with an encoding that is compliant with
    * <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a>.
    */
-  public String percentEncoded() {
+  @Override public String toString() {
     return encoded;
+  }
+
+  @Override public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    return encoded.equals(((Url) o).encoded);
+  }
+
+  @Override public int hashCode() {
+    return encoded.hashCode();
   }
 
   public static final class Builder {

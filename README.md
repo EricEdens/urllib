@@ -24,7 +24,7 @@ once we reach 1.0.
   - Support IPv4 hosts.
 - [x] 0.4
   - Support IPv6 hosts.
-- [ ] 0.5
+- [x] 0.5
   - Support IDN hosts.
 - [ ] 0.6
   - Utility method to classify a potential URL. Is it junk? A protocol-relative URL? An absolute path?
