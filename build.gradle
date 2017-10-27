@@ -56,5 +56,6 @@ compileJava {
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PUBLIC
+    options.encoding = 'UTF-8'
     exclude 'org/urllib/internal/*'
 }

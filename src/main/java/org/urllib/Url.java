@@ -226,7 +226,7 @@ public final class Url {
         sb.append(':').append(port);
       }
 
-      sb.append(path.percentEncoded());
+      sb.append(path.toString());
 
       if (!query.isEmpty()) {
         sb.append('?').append(query.percentEncoded());
