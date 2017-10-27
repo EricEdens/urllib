@@ -209,7 +209,7 @@ public final class Url {
           new StringBuilder()
               .append(scheme.name())
               .append("://")
-              .append(authority.host());
+              .append(authority.host().name());
 
       if (port != scheme.defaultPort()) {
         sb.append(':').append(port);

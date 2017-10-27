@@ -50,7 +50,7 @@ public abstract class Host {
    * <td>IPv6</td>
    * <td>http://[2001:db8::1:0:0:1]/</td>
    * <td>2001:db8::1:0:0:1</td>
-   * <td>2001:db8::1:0:0:1</td>
+   * <td>[2001:db8::1:0:0:1]</td>
    * </tr>
    * </table>
    *
@@ -235,10 +235,12 @@ public abstract class Host {
     // the address as 8 shorts.
     private static final int ADDRLEN = 8;
 
-    private final String hostname;
+    private final String host;
+    private final String hostWithBrackets;
 
-    Ip6(String hostname) {
-      this.hostname = hostname;
+    Ip6(String host) {
+      this.host = host;
+      this.hostWithBrackets = '[' + host + ']';
     }
 
     static Ip6 parse(String ip) {
@@ -403,11 +405,11 @@ public abstract class Host {
     }
 
     @Override public String name() {
-      return hostname;
+      return hostWithBrackets;
     }
 
     @Override public String toString() {
-      return hostname;
+      return host;
     }
   }
 }

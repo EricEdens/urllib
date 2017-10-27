@@ -22,7 +22,7 @@ once we reach 1.0.
   - Expose component fields (scheme, host, path, etc..) via methods on the `Url` object.
 - [x] 0.3
   - Support IPv4 hosts.
-- [ ] 0.4
+- [x] 0.4
   - Support IPv6 hosts.
 - [ ] 0.5
   - Support IDN hosts.

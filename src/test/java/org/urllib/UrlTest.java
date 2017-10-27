@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.util.Collections;
 import org.junit.Test;
 
@@ -77,12 +79,25 @@ public class UrlTest {
     assertEquals(Scheme.HTTPS, url.scheme());
   }
 
-  @Test public void host() {
+  @Test public void host() throws Exception {
     Url url = Url.http("host").create();
     assertEquals("host", url.host().toString());
 
     url = Url.http("10.10.0.1:9000").create();
     assertEquals("10.10.0.1", url.host().toString());
+
+    url = Url.http("2001:0db8:0000:0000:0000:8a2e:0370:7334").create();
+    assertEquals("2001:db8::8a2e:370:7334", url.host().toString());
+    assertEquals("http://[2001:db8::8a2e:370:7334]/", url.percentEncoded());
+
+    url = Url.http("[2001:db8::8a2e:370:7334]").create();
+    assertEquals("2001:db8::8a2e:370:7334", url.host().toString());
+    assertEquals("http://[2001:db8::8a2e:370:7334]/", url.percentEncoded());
+
+    url = Url.http("[::A]:9000").create();
+    assertEquals("::a", url.host().toString());
+    assertEquals("http://[::a]:9000/", url.percentEncoded());
+    assertEquals(9000, url.port());
   }
 
   @Test public void host_dontAllowInvalidIpv4() {
@@ -92,6 +107,12 @@ public class UrlTest {
     assertInvalidHost("3294823", "Invalid hostname");
     assertInvalidHost("1.1.1.1.1", "Invalid hostname");
     assertInvalidHost("-1:-1:-1:-1", "Invalid hostname");
+  }
+
+  @Test public void host_dontAllowInvalidIpv6() {
+    assertInvalidHost(":::", "Invalid hostname");
+    assertInvalidHost("1:2:3:4:5:6:7:8:9", "Invalid hostname");
+    assertInvalidHost("a::z:80", "Invalid hostname");
   }
 
   @Test public void host_dontAllowInvalidDns() {

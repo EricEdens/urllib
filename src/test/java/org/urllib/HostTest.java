@@ -63,19 +63,19 @@ public class HostTest {
   }
 
   @Test public void ipv6() {
-    assertEquals("::", Host.forString("::").name());
-    assertEquals("200:100::", Host.forString("[0200:0100:0:0::]").name());
-    assertEquals("2::", Host.forString("[2::]").name());
-    assertEquals("::2", Host.forString("[::2]").name());
-    assertEquals("1::2", Host.forString("[1::2]").name());
-    assertEquals("2001:db8::ff00:42:8329", Host.forString("2001:db8:0:0:0:ff00:42:8329").name());
-    assertEquals("1111:2222:3333:4444:5555:6666:7777:8888",
+    assertEquals("[::]", Host.forString("::").name());
+    assertEquals("[200:100::]", Host.forString("[0200:0100:0:0::]").name());
+    assertEquals("[2::]", Host.forString("[2::]").name());
+    assertEquals("[::2]", Host.forString("[::2]").name());
+    assertEquals("[1::2]", Host.forString("[1::2]").name());
+    assertEquals("[2001:db8::ff00:42:8329]", Host.forString("2001:db8:0:0:0:ff00:42:8329").name());
+    assertEquals("[1111:2222:3333:4444:5555:6666:7777:8888]",
         Host.forString("1111:2222:3333:4444:5555:6666:7777:8888").name());
-    assertEquals("1:2:3:4:5:6:7:8", Host.forString("1:2:3:4:5:6:7:8").name());
+    assertEquals("[1:2:3:4:5:6:7:8]", Host.forString("1:2:3:4:5:6:7:8").name());
   }
 
   @Test public void ipv6_empty() {
-    String expected = "::";
+    String expected = "[::]";
     assertEquals(expected, Host.forString("::").name());
     assertEquals(expected, Host.forString("::0").name());
     assertEquals(expected, Host.forString("::0:0").name());
@@ -85,7 +85,7 @@ public class HostTest {
   // From OkHttp
   @Test public void ipv6_differentFormats() {
     // Multiple representations of the same address; see http://tools.ietf.org/html/rfc5952.
-    String expected = "2001:db8::1:0:0:1";
+    String expected = "[2001:db8::1:0:0:1]";
     assertEquals(expected, Host.forString("[2001:db8:0:0:1:0:0:1]").name());
     assertEquals(expected, Host.forString("[2001:0db8:0:0:1:0:0:1]").name());
     assertEquals(expected, Host.forString("[2001:db8::1:0:0:1]").name());
@@ -98,18 +98,18 @@ public class HostTest {
 
   // From OkHttp
   @Test public void ipv6_leadingCompression() {
-    assertEquals("::1", Host.forString("[::0001]").name());
-    assertEquals("::1", Host.forString("[0000::0001]").name());
-    assertEquals("::1", Host.forString("[0000:0000:0000:0000:0000:0000:0000:0001]").name());
-    assertEquals("::1", Host.forString("[0000:0000:0000:0000:0000:0000::0001]").name());
+    assertEquals("[::1]", Host.forString("[::0001]").name());
+    assertEquals("[::1]", Host.forString("[0000::0001]").name());
+    assertEquals("[::1]", Host.forString("[0000:0000:0000:0000:0000:0000:0000:0001]").name());
+    assertEquals("[::1]", Host.forString("[0000:0000:0000:0000:0000:0000::0001]").name());
   }
 
   // From OkHttp
   @Test public void ipv6_trailingCompression() {
-    assertEquals("1::", Host.forString("[0001:0000::]").name());
-    assertEquals("1::", Host.forString("[0001::0000]").name());
-    assertEquals("1::", Host.forString("[0001::]").name());
-    assertEquals("1::", Host.forString("[1::]").name());
+    assertEquals("[1::]", Host.forString("[0001:0000::]").name());
+    assertEquals("[1::]", Host.forString("[0001::0000]").name());
+    assertEquals("[1::]", Host.forString("[0001::]").name());
+    assertEquals("[1::]", Host.forString("[1::]").name());
   }
 
   // From OkHttp
@@ -151,25 +151,25 @@ public class HostTest {
 
   // From OkHttp
   @Test public void ipv6_canonicalForm() {
-    assertEquals("abcd:ef01:2345:6789:abcd:ef01:2345:6789",
+    assertEquals("[abcd:ef01:2345:6789:abcd:ef01:2345:6789]",
         Host.forString("[abcd:ef01:2345:6789:abcd:ef01:2345:6789]").name());
-    assertEquals("a::b:0:0:0", Host.forString("[a:0:0:0:b:0:0:0]").name());
-    assertEquals("a:b:0:0:c::", Host.forString("[a:b:0:0:c:0:0:0]").name());
-    assertEquals("a:b::c:0:0", Host.forString("[a:b:0:0:0:c:0:0]").name());
-    assertEquals("a::b:0:0:0", Host.forString("[a:0:0:0:b:0:0:0]").name());
-    assertEquals("::a:b:0:0:0", Host.forString("[0:0:0:a:b:0:0:0]").name());
-    assertEquals("::a:0:0:0:b", Host.forString("[0:0:0:a:0:0:0:b]").name());
-    assertEquals("0:a:b:c:d:e:f:1", Host.forString("[0:a:b:c:d:e:f:1]").name());
-    assertEquals("a:b:c:d:e:f:1:0", Host.forString("[a:b:c:d:e:f:1:0]").name());
-    assertEquals("ff01::101", Host.forString("[FF01:0:0:0:0:0:0:101]").name());
-    assertEquals("2001:db8::1", Host.forString("[2001:db8::1]").name());
-    assertEquals("2001:db8::2:1", Host.forString("[2001:db8:0:0:0:0:2:1]").name());
-    assertEquals("2001:db8:0:1:1:1:1:1", Host.forString("[2001:db8:0:1:1:1:1:1]").name());
-    assertEquals("2001:db8::1:0:0:1", Host.forString("[2001:db8:0:0:1:0:0:1]").name());
-    assertEquals("2001:0:0:1::1", Host.forString("[2001:0:0:1:0:0:0:1]").name());
-    assertEquals("1::", Host.forString("[1:0:0:0:0:0:0:0]").name());
-    assertEquals("::1", Host.forString("[0:0:0:0:0:0:0:1]").name());
-    assertEquals("::", Host.forString("[0:0:0:0:0:0:0:0]").name());
+    assertEquals("[a::b:0:0:0]", Host.forString("[a:0:0:0:b:0:0:0]").name());
+    assertEquals("[a:b:0:0:c::]", Host.forString("[a:b:0:0:c:0:0:0]").name());
+    assertEquals("[a:b::c:0:0]", Host.forString("[a:b:0:0:0:c:0:0]").name());
+    assertEquals("[a::b:0:0:0]", Host.forString("[a:0:0:0:b:0:0:0]").name());
+    assertEquals("[::a:b:0:0:0]", Host.forString("[0:0:0:a:b:0:0:0]").name());
+    assertEquals("[::a:0:0:0:b]", Host.forString("[0:0:0:a:0:0:0:b]").name());
+    assertEquals("[0:a:b:c:d:e:f:1]", Host.forString("[0:a:b:c:d:e:f:1]").name());
+    assertEquals("[a:b:c:d:e:f:1:0]", Host.forString("[a:b:c:d:e:f:1:0]").name());
+    assertEquals("[ff01::101]", Host.forString("[FF01:0:0:0:0:0:0:101]").name());
+    assertEquals("[2001:db8::1]", Host.forString("[2001:db8::1]").name());
+    assertEquals("[2001:db8::2:1]", Host.forString("[2001:db8:0:0:0:0:2:1]").name());
+    assertEquals("[2001:db8:0:1:1:1:1:1]", Host.forString("[2001:db8:0:1:1:1:1:1]").name());
+    assertEquals("[2001:db8::1:0:0:1]", Host.forString("[2001:db8:0:0:1:0:0:1]").name());
+    assertEquals("[2001:0:0:1::1]", Host.forString("[2001:0:0:1:0:0:0:1]").name());
+    assertEquals("[1::]", Host.forString("[1:0:0:0:0:0:0:0]").name());
+    assertEquals("[::1]", Host.forString("[0:0:0:0:0:0:0:1]").name());
+    assertEquals("[::]", Host.forString("[0:0:0:0:0:0:0:0]").name());
   }
 
   private void assertInvalid(String host) {
