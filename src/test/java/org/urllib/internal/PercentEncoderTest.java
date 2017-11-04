@@ -21,35 +21,30 @@ public class PercentEncoderTest {
   // Semicolons are nasty. RFC 2396 has the idea of a "path parameter"
   // that uses the semicolon. In queries, some servers will split
   // at both the ampersand *and* the semicolon.
-  @Test
-  public void encodeSemicolons_inPathAndQuery() {
+  @Test public void encodeSemicolons_inPathAndQuery() {
     assertEquals("%3B", PercentEncoder.encodePathSegment(";"));
     assertEquals("%3B", PercentEncoder.encodeQueryComponent(";"));
   }
 
-  @Test
-  public void plusIsNotSpace_whenEncoding() {
+  @Test public void plusIsNotSpace_whenEncoding() {
     assertEquals("+", PercentEncoder.encodePathSegment("+"));
     assertEquals("%2B", PercentEncoder.encodeQueryComponent("+"));
     assertEquals("%2B", PercentEncoder.encodeQueryComponentNoPlusForSpace("+"));
     assertEquals("+", PercentEncoder.encodeFragment("+"));
   }
 
-  @Test
-  public void spaceIsPlus_onlyInQuery() {
+  @Test public void spaceIsPlus_onlyInQuery() {
     assertEquals("%20", PercentEncoder.encodePathSegment(" "));
     assertEquals("+", PercentEncoder.encodeQueryComponent(" "));
     assertEquals("%20", PercentEncoder.encodeQueryComponentNoPlusForSpace(" "));
     assertEquals("%20", PercentEncoder.encodeFragment(" "));
   }
 
-  @Test
-  public void queryIsEncoded_sameAsURLEncoder() throws UnsupportedEncodingException {
+  @Test public void queryIsEncoded_sameAsURLEncoder() throws UnsupportedEncodingException {
     assertEquals(URLEncoder.encode(ASCII, "UTF-8"), PercentEncoder.encodeQueryComponent(ASCII));
   }
 
-  @Test
-  public void encodedSegments_acceptedByJavaNetUri() throws URISyntaxException {
+  @Test public void encodedSegments_acceptedByJavaNetUri() throws URISyntaxException {
     String url = "http://host"
         + '/' + PercentEncoder.encodePathSegment(ASCII)
         + '?' + PercentEncoder.encodeQueryComponentNoPlusForSpace(ASCII)
@@ -60,8 +55,7 @@ public class PercentEncoderTest {
     assertEquals(ASCII, uri.getFragment());
   }
 
-  @Test
-  public void rfc3986_pathEncodingRequired() {
+  @Test public void rfc3986_pathEncodingRequired() {
     assertEquals("%00", PercentEncoder.encodePathSegment("\u0000"));
     assertEquals("%01", PercentEncoder.encodePathSegment("\u0001"));
     assertEquals("%02", PercentEncoder.encodePathSegment("\u0002"));
@@ -113,8 +107,7 @@ public class PercentEncoderTest {
     assertEquals("%7F", PercentEncoder.encodePathSegment("\u007f"));
   }
 
-  @Test
-  public void rfc3986_pathEncodingOptional() {
+  @Test public void rfc3986_pathEncodingOptional() {
     assertMaybeEncoded('!', PercentEncoder.encodePathSegment("!"));
     assertMaybeEncoded('$', PercentEncoder.encodePathSegment("$"));
     assertMaybeEncoded('&', PercentEncoder.encodePathSegment("&"));

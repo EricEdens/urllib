@@ -8,20 +8,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.urllib.internal.Joiner;
-import org.urllib.internal.PercentEncoder;
-import org.urllib.internal.Strings;
 
 public final class Query {
 
   private static final Query empty = of(Collections.<KeyValue>emptyList());
 
   @Nonnull private final List<KeyValue> params;
-  @Nonnull private final String encoded;
 
-  private Query(@Nonnull List<KeyValue> params, @Nonnull String encoded) {
+  private Query(@Nonnull List<KeyValue> params) {
     this.params = params;
-    this.encoded = encoded;
   }
 
   static Query create(Map<String, String> paramMap) {
@@ -37,25 +32,11 @@ public final class Query {
   }
 
   private static Query of(List<KeyValue> params) {
-    return new Query(Collections.unmodifiableList(params), encode(params));
-  }
-
-  private static String encode(List<KeyValue> params) {
-    if (params.isEmpty()) return "";
-    int length = params.size();
-    String[] encodedPairs = new String[length];
-    for (int i = 0; i < length; i++) {
-      encodedPairs[i] = params.get(i).encoded();
-    }
-    return Joiner.on('&').join(encodedPairs);
+    return new Query(Collections.unmodifiableList(params));
   }
 
   public List<KeyValue> params() {
     return params;
-  }
-
-  public String percentEncoded() {
-    return encoded;
   }
 
   public Map<String, String> asMap() {
@@ -79,18 +60,18 @@ public final class Query {
     }
     if (o instanceof Query) {
       Query that = (Query) o;
-      return this.percentEncoded().equals(that.percentEncoded());
+      return this.params.equals(that.params);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return percentEncoded().hashCode();
+    return params.hashCode();
   }
 
   public boolean isEmpty() {
-    return percentEncoded().isEmpty();
+    return params.isEmpty();
   }
 
   public static final class KeyValue {
@@ -115,13 +96,20 @@ public final class Query {
       return value;
     }
 
-    public String encoded() {
-      if (Strings.isNullOrEmpty(value())) {
-        return PercentEncoder.encodeQueryComponentNoPlusForSpace(key());
-      } else {
-        return PercentEncoder.encodeQueryComponentNoPlusForSpace(key())
-            + '=' + PercentEncoder.encodeQueryComponentNoPlusForSpace(value());
-      }
+    @Override public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      KeyValue keyValue = (KeyValue) o;
+
+      if (!key.equals(keyValue.key)) return false;
+      return value != null ? value.equals(keyValue.value) : keyValue.value == null;
+    }
+
+    @Override public int hashCode() {
+      int result = key.hashCode();
+      result = 31 * result + (value != null ? value.hashCode() : 0);
+      return result;
     }
 
     @Override public String toString() {

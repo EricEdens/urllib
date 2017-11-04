@@ -1,7 +1,6 @@
 package org.urllib;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
@@ -48,13 +47,12 @@ import org.urllib.internal.Port;
  */
 public final class Url {
 
-  private final Scheme scheme;
+  @Nonnull private final Scheme scheme;
   private final int port;
-  private final Authority authority;
-  private final Path path;
-  private final Query query;
-  private final Fragment fragment;
-  private final String encoded;
+  @Nonnull private final Authority authority;
+  @Nonnull private final Path path;
+  @Nonnull private final Query query;
+  @Nonnull private final String fragment;
 
   private Url(Builder builder) {
     this.scheme = builder.scheme;
@@ -63,7 +61,6 @@ public final class Url {
     this.path = builder.path;
     this.query = builder.query;
     this.fragment = builder.fragment;
-    this.encoded = builder.toString();
   }
 
   public static Builder http(String host) {
@@ -130,37 +127,54 @@ public final class Url {
    *
    * @see <a href="https://tools.ietf.org/html/rfc3986#section-3.5">RFC 3986#3.5</a>
    */
-  @Nonnull public Fragment fragment() {
+  @Nonnull public String fragment() {
     return fragment;
   }
 
-  /**
-   * Re-assemble the Url with an encoding that is compliant with
-   * <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a>.
-   */
-  @Override public String toString() {
-    return encoded;
-  }
 
   @Override public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    return encoded.equals(((Url) o).encoded);
+    Url url = (Url) o;
+
+    if (port != url.port) return false;
+    if (!scheme.equals(url.scheme)) return false;
+    if (!authority.equals(url.authority)) return false;
+    if (!path.equals(url.path)) return false;
+    if (!query.equals(url.query)) return false;
+    return fragment.equals(url.fragment);
   }
 
   @Override public int hashCode() {
-    return encoded.hashCode();
+    int result = scheme.hashCode();
+    result = 31 * result + port;
+    result = 31 * result + authority.hashCode();
+    result = 31 * result + path.hashCode();
+    result = 31 * result + query.hashCode();
+    result = 31 * result + fragment.hashCode();
+    return result;
+  }
+
+  @Override public String toString() {
+    return "Url{" +
+        "scheme=" + scheme +
+        ", port=" + port +
+        ", authority=" + authority +
+        ", path=" + path +
+        ", query=" + query +
+        ", fragment='" + fragment + '\'' +
+        '}';
   }
 
   public static final class Builder {
 
-    private Scheme scheme;
+    @Nonnull private Scheme scheme;
     private int port;
-    private Authority authority;
-    private Path path = Path.empty();
-    private Query query = Query.empty();
-    private Fragment fragment = Fragment.empty();
+    @Nonnull private Authority authority;
+    @Nonnull private Path path = Path.empty();
+    @Nonnull private Query query = Query.empty();
+    @Nonnull private String fragment = "";
 
     private Builder() {}
 
@@ -198,45 +212,12 @@ public final class Url {
     }
 
     public Builder fragment(String fragment) {
-      this.fragment = Fragment.of(fragment);
+      this.fragment = fragment;
       return this;
     }
 
     public Url create() {
       return new Url(this);
-    }
-
-    public URI toURI() {
-      try {
-        return new URI(toString());
-      } catch (URISyntaxException e) {
-        // Reaching this would be a bug in this library.
-        throw new AssertionError(e);
-      }
-    }
-
-    @Override public String toString() {
-      StringBuilder sb =
-          new StringBuilder()
-              .append(scheme.name())
-              .append("://")
-              .append(authority.host().name());
-
-      if (port != scheme.defaultPort()) {
-        sb.append(':').append(port);
-      }
-
-      sb.append(path.toString());
-
-      if (!query.isEmpty()) {
-        sb.append('?').append(query.percentEncoded());
-      }
-
-      if (!fragment.isEmpty()) {
-        sb.append('#').append(fragment.percentEncoded());
-      }
-
-      return sb.toString();
     }
   }
 }

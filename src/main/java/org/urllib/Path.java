@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.urllib.internal.CodepointMatcher;
-import org.urllib.internal.Joiner;
-import org.urllib.internal.PercentEncoder;
 
 /**
  * A hierarchical URL component that typically represents a location on a file system.
@@ -33,14 +31,10 @@ import org.urllib.internal.PercentEncoder;
  */
 public final class Path {
 
-  private static final Joiner DIRECTORY_JOINER = Joiner.on("/", "/", "/");
-  private static final Joiner FILE_JOINER = Joiner.on("/", "/", "");
-
   private static final Path EMPTY = new Path(new PathBuilder());
 
   @Nonnull private final List<String> segments;
   private final boolean isDir;
-  @Nonnull private final String encoded;
 
   /**
    * Creates a {@link Path} by joining {@code segments}.
@@ -91,16 +85,6 @@ public final class Path {
   private Path(PathBuilder pathBuilder) {
     this.segments = pathBuilder.segments;
     this.isDir = pathBuilder.isDir;
-
-    if (segments.isEmpty()) {
-      this.encoded = "/";
-    } else {
-      String[] encodedSegments = new String[segments.size()];
-      for (int i = 0; i < segments.size(); i++) {
-        encodedSegments[i] = PercentEncoder.encodePathSegment(segments.get(i));
-      }
-      this.encoded = (isDir ? DIRECTORY_JOINER : FILE_JOINER).join(encodedSegments);
-    }
   }
 
   /**
@@ -115,7 +99,7 @@ public final class Path {
    * since this class enforces that all paths are absolute.
    */
   public boolean isEmpty() {
-    return "/".equals(encoded);
+    return segments.isEmpty();
   }
 
   /**
@@ -153,18 +137,9 @@ public final class Path {
     return isDirectory() ? "" : segments().get(segments().size() - 1);
   }
 
-  /**
-   * Returns the assembled path, with a percent encoding that is compliant with RFC 3986.<pre>{@code
-   *
-   *   assertEquals("/%23/%E2%9C%93/%09", Path.of("#", "✓", "\t").toString());
-   * }</pre>
-   *
-   * <p>The returned value can be used when constructing a URL, or when constructing the resource
-   * line of an HTTP request.
-   */
   @Nonnull @Override
   public String toString() {
-    return encoded;
+    return segments.toString();
   }
 
   @Override public boolean equals(Object o) {

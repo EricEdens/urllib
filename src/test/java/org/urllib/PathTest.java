@@ -10,8 +10,7 @@ import org.junit.Test;
 
 public class PathTest {
 
-  @Test
-  public void isEmpty() {
+  @Test public void isEmpty() {
     assertTrue(Path.empty().isEmpty());
     assertTrue(Path.of().isEmpty());
     assertTrue(Path.of("").isEmpty());
@@ -24,21 +23,18 @@ public class PathTest {
     assertEquals(Path.empty(), Path.of("", ""));
   }
 
-  @Test
-  public void pathIsAlwaysAbsolute() {
-    assertEquals("/a", Path.of("/a").toString());
-    assertEquals("/a", Path.of("a").toString());
-    assertEquals("/a", Path.of("./a").toString());
-    assertEquals("/a", Path.of("../a").toString());
+  @Test public void pathIsAlwaysAbsolute() {
+    Path expected = Path.of("/a");
+    assertEquals(expected, Path.of("a"));
+    assertEquals(expected, Path.of("./a"));
+    assertEquals(expected, Path.of("../a"));
   }
 
-  @Test
-  public void emptySegmentsAreRemoved() {
-    assertEquals("/a/b/c/", Path.of("a/", "/b", "//c//").toString());
+  @Test public void emptySegmentsAreRemoved() {
+    assertEquals(Path.of("/a/b/c/"), Path.of("a/", "/b", "//c//"));
   }
 
-  @Test
-  public void isDir() {
+  @Test public void isDir() {
     assertTrue(Path.of("/a", "").isDirectory());
     assertTrue(Path.of("/a/").isDirectory());
 
@@ -46,31 +42,24 @@ public class PathTest {
     assertFalse(Path.of("a").isDirectory());
   }
 
-  @Test
-  public void encodeQueryAndFragment() {
-    assertEquals("/%3F/%23", Path.of("?", "#").toString());
+  @Test public void cleanIncorrectSlashes() {
+    assertEquals(Path.of("/"), Path.of("\\"));
+    assertEquals(Path.of("/path"), Path.of("\\path"));
+    assertEquals(Path.of("/path/"), Path.of("\\path\\"));
   }
 
-  @Test
-  public void cleanIncorrectSlashes() {
-    assertEquals("/", Path.of("\\").toString());
-    assertEquals("/path", Path.of("\\path").toString());
+  @Test public void removeDotSegments() {
+    assertEquals(Arrays.asList(), Path.of(".").segments());
+    assertEquals(Arrays.asList(), Path.of("..").segments());
+    assertEquals(Arrays.asList(), Path.of("/parent/..").segments());
+    assertEquals(Arrays.asList("parent"), Path.of("/parent/.").segments());
+    assertEquals(Arrays.asList("parent"), Path.of("/parent/%2e").segments());
+    assertEquals(Arrays.asList("parent"), Path.of("/parent/%2e/").segments());
+    assertEquals(Arrays.asList("parent", "dir"), Path.of("/parent/%2e/dir").segments());
+    assertEquals(Arrays.asList("dir"), Path.of("/parent/%2e%2E/dir").segments());
   }
 
-  @Test
-  public void removeDotSegments() {
-    assertEquals("/", Path.of(".").toString());
-    assertEquals("/", Path.of("..").toString());
-    assertEquals("/", Path.of("/parent/..").toString());
-    assertEquals("/parent/", Path.of("/parent/.").toString());
-    assertEquals("/parent/", Path.of("/parent/%2e").toString());
-    assertEquals("/parent/", Path.of("/parent/%2e/").toString());
-    assertEquals("/parent/dir", Path.of("/parent/%2e/dir").toString());
-    assertEquals("/dir", Path.of("/parent/%2e%2E/dir").toString());
-  }
-
-  @Test
-  public void segmentsIncludeFilename() {
+  @Test public void segmentsIncludeFilename() {
     assertEquals(Arrays.asList("a"), Path.of("/a").segments());
     assertEquals(Arrays.asList("a"), Path.of("/a/").segments());
     assertEquals(Arrays.asList("a", "b"), Path.of("/a/b").segments());
@@ -78,18 +67,15 @@ public class PathTest {
     assertEquals(Arrays.asList("a", "b", "c"), Path.of("/a/b/c").segments());
   }
 
-  @Test
-  public void filenameIsNotEncoded() {
+  @Test public void filenameIsNotEncoded() {
     assertEquals("résumé.html", Path.of("/docs/résumé.html").filename());
   }
 
-  @Test
-  public void filenameDefaultsToEmptyString() {
+  @Test public void filenameDefaultsToEmptyString() {
     assertEquals("", Path.of("/lib/").filename());
   }
 
-  @Test
-  public void equalsAndHashcode() {
+  @Test public void equalsAndHashcode() {
     Path a1 = Path.of("a", "b", "c/");
     Path a2 = Path.of("/a/", "/b/", "/c/");
     Path a3 = Path.of("/a", "b", "c", "");
