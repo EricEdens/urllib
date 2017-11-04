@@ -88,6 +88,18 @@ public abstract class CodepointMatcher {
 
   public static final CodepointMatcher ALPHANUMERIC = or(ALPHA, DIGIT);
 
+  public static final CodepointMatcher UNRESERVED = new CodepointMatcher() {
+    @Override public boolean matches(int codepoint) {
+      return codepoint >= 'a' && codepoint <= 'z'
+          || codepoint >= 'A' && codepoint <= 'Z'
+          || codepoint >= '0' && codepoint <= '9'
+          || codepoint == '-'
+          || codepoint == '.'
+          || codepoint == '_'
+          || codepoint == '~';
+    }
+  };
+
   public static CodepointMatcher or(final CodepointMatcher one, final CodepointMatcher two) {
     return new CodepointMatcher() {
       @Override public boolean matches(int codepoint) {

@@ -112,7 +112,7 @@ public abstract class Host {
 
     String ascii;
     try {
-      ascii = IDN.toASCII(PercentDecoder.decode(hostname, DNS), IDN.ALLOW_UNASSIGNED);
+      ascii = IDN.toASCII(PercentDecoder.decodeUnreserved(hostname), IDN.ALLOW_UNASSIGNED);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Invalid hostname: " + hostname);
     }
