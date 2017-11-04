@@ -3,11 +3,13 @@ package org.urllib;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.urllib.internal.PercentDecoder;
 
 public final class Query {
 
@@ -33,6 +35,36 @@ public final class Query {
 
   private static Query of(List<KeyValue> params) {
     return new Query(Collections.unmodifiableList(params));
+  }
+
+  static Query parse(String query) {
+    if (query.isEmpty()) return empty();
+    query = query.replace('+', ' ');
+    List<KeyValue> params = new LinkedList<>();
+    int p = 0;
+    int equal = -1;
+    for (int i = 0; i <= query.length(); i++) {
+      if (i == query.length() || query.charAt(i) == '&') {
+        if (i == p) {
+        } else if (equal == -1) {
+          String key = PercentDecoder.decodeAll(query.substring(p, i));
+          params.add(KeyValue.create(key, ""));
+        } else {
+          String key = (p == equal)
+              ? ""
+              : PercentDecoder.decodeAll(query.substring(p, equal));
+          String value = (i == equal + 1)
+              ? ""
+              : PercentDecoder.decodeAll(query.substring(equal + 1, i));
+          params.add(KeyValue.create(key, value));
+        }
+        equal = -1;
+        p = i + 1;
+      } else if (query.charAt(i) == '=' && equal == -1) {
+        equal = i;
+      }
+    }
+    return of(params);
   }
 
   public List<KeyValue> params() {

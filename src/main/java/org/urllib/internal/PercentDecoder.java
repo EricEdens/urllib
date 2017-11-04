@@ -13,6 +13,7 @@ public final class PercentDecoder {
   }
 
   private static String decode(String str, CodepointMatcher decodeSet) {
+    if (str.isEmpty()) return str;
     if (!requiresDecoding(str, decodeSet)) return str;
 
     byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
