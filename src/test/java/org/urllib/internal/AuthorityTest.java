@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.urllib.UrlException;
 
 public class AuthorityTest {
 
@@ -62,7 +61,7 @@ public class AuthorityTest {
     try {
       Authority authority = Authority.split(str);
       fail("Expected UrlException; result was: " + authority);
-    } catch (UrlException expected) {
+    } catch (IllegalArgumentException expected) {
       assertThat(expected.getMessage(), containsString(msg));
     }
   }

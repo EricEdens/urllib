@@ -2,7 +2,6 @@ package org.urllib.internal;
 
 import com.google.auto.value.AutoValue;
 import org.urllib.Host;
-import org.urllib.UrlException;
 
 @AutoValue
 public abstract class Authority {
@@ -36,7 +35,7 @@ public abstract class Authority {
     start++;
 
     if (start == end || start == lastColon) {
-      throw new UrlException("Host cannot be empty. Input: " + authority);
+      throw new IllegalArgumentException("Host cannot be empty. Input: " + authority);
     }
 
     if (numColons == 1) {

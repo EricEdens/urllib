@@ -1,7 +1,5 @@
 package org.urllib.internal;
 
-import org.urllib.UrlException;
-
 public class Port {
 
   private static final int MIN_PORT = 1;
@@ -27,8 +25,8 @@ public class Port {
     throw portException(String.valueOf(port));
   }
 
-  private static UrlException portException(String portString) {
-    return new UrlException(
+  private static IllegalArgumentException portException(String portString) {
+    return new IllegalArgumentException(
         String.format("Invalid port in authority. Valid values are [%d-%d] inclusive. Found: %s",
             MIN_PORT, MAX_PORT, portString));
   }
