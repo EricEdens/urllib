@@ -2,25 +2,14 @@ package org.urllib.internal;
 
 public abstract class PercentEncoder {
 
-  private static final String ALPHANUMERIC =
-      "0123456789"
-          + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-          + "abcdefghijklmnopqrstuvwxyz";
-
-  private static final String PCHAR_WITHOUT_SEMICOLON =
-      ALPHANUMERIC
-          + "-._~" // Unreserved characters.
-          + "!$'()*,&=+" // The subdelim characters (excluding ';').
-          + "@:"; // The gendelim characters permitted in paths.
-
   private static final CodepointMatcher safePath =
-      CodepointMatcher.anyOf(PCHAR_WITHOUT_SEMICOLON);
+      CodepointMatcher.anyOf(EncodeRules.PATH);
 
   private static final CodepointMatcher safeQuery =
-      CodepointMatcher.anyOf("*-._" + ALPHANUMERIC);
+      CodepointMatcher.anyOf(EncodeRules.QUERY);
 
   private static final CodepointMatcher safeFragment =
-      CodepointMatcher.anyOf(PCHAR_WITHOUT_SEMICOLON + ";/?");
+      CodepointMatcher.anyOf(EncodeRules.FRAGMENT);
 
   public static String encodePathSegment(String segment) {
     return PercentEncoder.encode(segment, safePath, false);

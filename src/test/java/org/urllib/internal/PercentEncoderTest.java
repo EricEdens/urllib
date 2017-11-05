@@ -40,10 +40,6 @@ public class PercentEncoderTest {
     assertEquals("%20", PercentEncoder.encodeFragment(" "));
   }
 
-  @Test public void queryIsEncoded_sameAsURLEncoder() throws UnsupportedEncodingException {
-    assertEquals(URLEncoder.encode(ASCII, "UTF-8"), PercentEncoder.encodeQueryComponent(ASCII));
-  }
-
   @Test public void encodedSegments_acceptedByJavaNetUri() throws URISyntaxException {
     String url = "http://host"
         + '/' + PercentEncoder.encodePathSegment(ASCII)

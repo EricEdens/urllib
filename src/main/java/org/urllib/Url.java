@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import org.urllib.internal.Authority;
+import org.urllib.internal.PercentEncoder;
 import org.urllib.internal.Port;
 
 /**
@@ -157,14 +158,26 @@ public final class Url {
   }
 
   @Override public String toString() {
-    return "Url{" +
-        "scheme=" + scheme +
-        ", port=" + port +
-        ", authority=" + authority +
-        ", path=" + path +
-        ", query=" + query +
-        ", fragment='" + fragment + '\'' +
-        '}';
+    StringBuilder sb = new StringBuilder()
+        .append(scheme.name())
+        .append("://")
+        .append(host().name());
+
+    if (port != scheme.defaultPort()) {
+      sb.append(':').append(port);
+    }
+
+    sb.append(path);
+
+    if (!query.isEmpty()) {
+      sb.append('?').append(query);
+    }
+
+    if (!fragment.isEmpty()) {
+      sb.append('#').append(PercentEncoder.encodeFragment(fragment));
+    }
+
+    return sb.toString();
   }
 
   public static final class Builder {

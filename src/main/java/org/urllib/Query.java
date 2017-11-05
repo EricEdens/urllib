@@ -3,6 +3,7 @@ package org.urllib;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.urllib.internal.PercentDecoder;
+import org.urllib.internal.PercentEncoder;
 
 public final class Query {
 
@@ -82,7 +84,19 @@ public final class Query {
   }
 
   @Override public String toString() {
-    return params.toString();
+    StringBuilder sb = new StringBuilder();
+    for (Iterator<KeyValue> iterator = params.iterator(); iterator.hasNext(); ) {
+      KeyValue param = iterator.next();
+      sb.append(PercentEncoder.encodeQueryComponent(param.key()));
+      if (param.value() != null && !param.value().isEmpty()) {
+        sb.append('=')
+            .append(PercentEncoder.encodeQueryComponent(param.value()));
+      }
+      if (iterator.hasNext()) {
+        sb.append('&');
+      }
+    }
+    return sb.toString();
   }
 
   @Override

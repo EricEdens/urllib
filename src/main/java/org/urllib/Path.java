@@ -1,10 +1,12 @@
 package org.urllib;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.urllib.internal.CodepointMatcher;
+import org.urllib.internal.PercentEncoder;
 
 /**
  * A hierarchical URL component that typically represents a location on a file system.
@@ -139,7 +141,15 @@ public final class Path {
 
   @Nonnull @Override
   public String toString() {
-    return segments.toString();
+    StringBuilder sb = new StringBuilder("/");
+    for (Iterator<String> iterator = segments.iterator(); iterator.hasNext(); ) {
+      String segment = iterator.next();
+      sb.append(PercentEncoder.encodePathSegment(segment));
+      if (iterator.hasNext() || isDirectory()) {
+        sb.append('/');
+      }
+    }
+    return sb.toString();
   }
 
   @Override public boolean equals(Object o) {
