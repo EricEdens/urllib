@@ -26,6 +26,7 @@ public abstract class CodepointMatcher {
     return matches((int) c);
   }
 
+
   public static final CodepointMatcher NONE = new CodepointMatcher() {
     @Override public boolean matches(int codepoint) {
       return false;
@@ -38,7 +39,8 @@ public abstract class CodepointMatcher {
     }
   };
 
-  public static final CodepointMatcher WHITESPACE = anyOf(
+  // http://unicode.org/cldr/utility/list-unicodeset.jsp?a=[:White_Space=Yes:]
+  public static final CodepointMatcher UNICODE_WHITESPACE = anyOf(
       0x0009,
       0x000A,
       0x000B,
@@ -64,6 +66,15 @@ public abstract class CodepointMatcher {
       0x202F,
       0x205F,
       0x3000);
+
+  public static final CodepointMatcher ASCII_WHITESPACE = anyOf(
+      0x0009,
+      0x000A,
+      0x000C,
+      0x000D,
+      0x0020);
+
+  public static final CodepointMatcher ASCII_NEWLINE = anyOf('\n', '\r');
 
   public static final CodepointMatcher ALPHA = new CodepointMatcher() {
     @Override public boolean matches(int codepoint) {

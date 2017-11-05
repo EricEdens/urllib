@@ -18,7 +18,7 @@ public abstract class SplitUrl {
 
   public static SplitUrl split(String url) {
 
-    String trim = CodepointMatcher.WHITESPACE.trim(url);
+    String trim = CodepointMatcher.ASCII_WHITESPACE.trim(url);
 
     if (trim.isEmpty()) {
       return SplitUrl.builder()

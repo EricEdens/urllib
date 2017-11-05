@@ -6,7 +6,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Collections;
 import org.junit.Test;
+import org.urllib.Query.KeyValue;
 
 public class UrlTest {
 
@@ -118,8 +120,8 @@ public class UrlTest {
     assertEquals(80, Url.https("localhost:80").create().port());
   }
 
-  @Test public void parseDecodesUnreservedBeforeParsing() {
-    assertEquals(Url.http("example.com").create(), Url.parse("%68ttp://example%2ecom"));
+  @Test public void trimWhitespaceBeforeParsing() {
+    assertEquals(Url.http("example.com").create(), Url.parse("  http://\nexample.\n  com  "));
   }
 
   @Test public void parseRequiresSchemeAndHost() {
@@ -198,7 +200,7 @@ public class UrlTest {
     assertEquals(expected, Url.parse("http://host.com#fragment").path());
   }
 
-  @Test public void parseRemovesDotSegments() {
+  @Test public void parseRemovesDotSegmentsInPath() {
     assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/").path());
     assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/.").path());
     assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/..").path());
@@ -210,10 +212,23 @@ public class UrlTest {
     assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/%2E%2e").path());
   }
 
-  @Test public void parseRemovesUrlEncodingInPath() {
-    Url url = Url.parse("http://host.com/docs/r%C3%A9sum%C3%A9.html");
-    assertEquals(Path.of("/docs/résumé.html"), url.path());
-    assertEquals(Arrays.asList("docs", "résumé.html"), url.path().segments());
+  @Test public void parseRemovesEmptyQueryValues() {
+    Query expected = Query.of(Arrays.asList(KeyValue.create("k", "")));
+    assertEquals(expected, Url.parse("http://host.com?k=").query());
+    assertEquals(expected, Url.parse("http://host.com?k").query());
+  }
+
+  @Test public void parseRetainsDuplicateKeysInQuery() {
+    Query expected = Query.of(
+        Arrays.asList(KeyValue.create("k", "a"), KeyValue.create("k", "b")));
+    assertEquals(expected, Url.parse("http://host.com?k=a&k=b").query());
+  }
+
+  @Test public void parseRemovesPercentEncoding() {
+    Url decoded = Url.parse("http://host.com/docs/résumé.html?q=\uD83D\uDC3C#\uD83D\uDE03");
+    Url encoded = Url.parse("http://host.com/docs/r%C3%A9sum%C3%A9.html?q=%F0%9F%90%BC#%F0%9F%98%83");
+    assertEquals(decoded, encoded);
+    assertEquals(decoded, encoded);
   }
 
   @Test public void parseHandlesSlashesInBothDirections() {

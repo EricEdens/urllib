@@ -83,7 +83,7 @@ public final class Url {
   }
 
   @Nonnull public static Url parse(String url) {
-    SplitUrl split = SplitUrl.split(PercentDecoder.decodeUnreserved(url));
+    SplitUrl split = SplitUrl.split(Strings.sanitizeWhitespace(url));
     if (split.urlType() != Type.FULL) {
       throw new IllegalArgumentException("URL must have a scheme and host. Eg: http://host.com/");
     }
@@ -94,6 +94,14 @@ public final class Url {
 
     if (!Strings.isNullOrEmpty(split.path())) {
       builder.path(Path.parse(split.path()));
+    }
+
+    if (!Strings.isNullOrEmpty(split.query())) {
+      builder.query(Query.parse(split.query()));
+    }
+
+    if (!Strings.isNullOrEmpty(split.fragment())) {
+      builder.fragment(PercentDecoder.decodeAll(split.fragment()));
     }
 
     return builder.create();
@@ -247,6 +255,11 @@ public final class Url {
 
     public Builder query(Map<String, String> query) {
       this.query = Query.create(query);
+      return this;
+    }
+
+    private Builder query(Query query) {
+      this.query = query;
       return this;
     }
 

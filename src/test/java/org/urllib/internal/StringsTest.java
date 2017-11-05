@@ -1,6 +1,7 @@
 package org.urllib.internal;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -18,6 +19,17 @@ public class StringsTest {
     assertTrue(Strings.isNullOrEmpty(null));
     assertTrue(Strings.isNullOrEmpty(""));
     assertFalse(Strings.isNullOrEmpty("a"));
+  }
+
+  @Test public void santizeWhitespace() {
+    assertEquals("", Strings.sanitizeWhitespace("   "));
+    assertEquals("a", Strings.sanitizeWhitespace(" a  "));
+    assertEquals("ab", Strings.sanitizeWhitespace(" a\nb  "));
+    assertEquals("ab", Strings.sanitizeWhitespace(" a\n  b  "));
+    assertEquals("ab", Strings.sanitizeWhitespace("a\n  b"));
+    assertEquals("ab  c", Strings.sanitizeWhitespace("a\n  b  c"));
+    assertEquals("ab  c", Strings.sanitizeWhitespace("a\n  b  c"));
+    assertEquals("a", Strings.sanitizeWhitespace("a\n  "));
   }
 
 }

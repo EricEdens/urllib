@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
+import org.urllib.internal.Strings;
 
 public final class Query {
 
@@ -35,7 +36,7 @@ public final class Query {
     return empty;
   }
 
-  private static Query of(List<KeyValue> params) {
+  static Query of(List<KeyValue> params) {
     return new Query(Collections.unmodifiableList(params));
   }
 
@@ -131,7 +132,7 @@ public final class Query {
     }
 
     public static KeyValue create(String key, String value) {
-      return new KeyValue(key, value);
+      return new KeyValue(key, Strings.nullToEmpty(value));
     }
 
     @Nonnull public String key() {

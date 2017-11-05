@@ -26,14 +26,14 @@ once we reach 1.0.
   - Support IPv6 hosts.
 - [x] 0.5
   - Support IDN hosts.
-- [ ] 0.6
-  - Utility method to classify a potential URL. Is it junk? A protocol-relative URL? An absolute path?
-- [ ] 0.7
-  - Resolve a possibly-relative link against an existing `Url` 
-- [ ] 0.8
-  - Utility method to canonicalize previously-encoded URLs.
-- [ ] 0.9
+- [x] 0.6
   - Create a `Url` by parsing.
+- [ ] 0.7
+  - Utility method to classify a potential URL. Is it junk? A protocol-relative URL? An absolute path?
+- [ ] 0.8
+  - Resolve a possibly-relative link against an existing `Url` 
+- [ ] 0.9
+  - Utility method to canonicalize previously-encoded URLs.
 - [ ] 1.0
   - Encode a `Url` to display to users (like in a web browser URL bar)
   
