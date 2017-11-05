@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.urllib.internal.CodepointMatcher;
+import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
 
 /**
@@ -74,10 +75,16 @@ public final class Path {
 
     PathBuilder pathBuilder = new PathBuilder();
     for (String segment : segments) {
-      pathBuilder.splitAndAdd(segment);
+      pathBuilder.splitAndAdd(segment, false);
     }
 
     return new Path(pathBuilder);
+  }
+
+  static Path parse(String path) {
+    return path.isEmpty()
+        ? EMPTY
+        : new Path(new PathBuilder().splitAndAdd(path, true));
   }
 
   static Path empty() {
@@ -177,36 +184,37 @@ public final class Path {
 
     private boolean isDir = false;
 
-    public void splitAndAdd(String segment) {
+    public PathBuilder splitAndAdd(String segment, boolean decode) {
       if (SLASH_MATCHER.matchesAnyOf(segment)) {
         int i = 0;
         int j = 0;
         for (; j < segment.length(); j++) {
           if (SLASH_MATCHER.matches(segment.charAt(j))) {
-            add(segment.substring(i, j));
+            add(segment.substring(i, j), decode);
             i = j + 1;
           }
         }
-        add(segment.substring(i, j));
+        return add(segment.substring(i, j), decode);
       } else {
-        add(segment);
+        return add(segment, decode);
       }
     }
 
-    private void add(String segment) {
+    private PathBuilder add(String segment, boolean decode) {
       if (segment.isEmpty()) {
         isDir = true;
       } else if (SINGLE_DOT.matcher(segment).matches()) {
         isDir = true;
       } else if (DOUBLE_DOT.matcher(segment).matches()) {
         if (!segments.isEmpty()) {
-          segments.remove();
+          segments.removeLast();
         }
         isDir = true;
       } else {
-        segments.add(segment);
+        segments.add(decode ? PercentDecoder.decodeAll(segment) : segment);
         isDir = false;
       }
+      return this;
     }
   }
 }

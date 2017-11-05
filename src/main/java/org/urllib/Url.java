@@ -92,6 +92,10 @@ public final class Url {
         .scheme(Scheme.valueOf(split.scheme()))
         .host(split.authority());
 
+    if (!Strings.isNullOrEmpty(split.path())) {
+      builder.path(Path.parse(split.path()));
+    }
+
     return builder.create();
   }
 
@@ -228,6 +232,11 @@ public final class Url {
 
     public Builder path(String... splittableSegments) {
       this.path = Path.of(splittableSegments);
+      return this;
+    }
+
+    private Builder path(Path path) {
+      this.path = path;
       return this;
     }
 

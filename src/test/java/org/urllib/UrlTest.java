@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import org.junit.Test;
 
 public class UrlTest {
@@ -195,6 +196,28 @@ public class UrlTest {
     assertEquals(expected, Url.parse("http://host.com/").path());
     assertEquals(expected, Url.parse("http://host.com?query").path());
     assertEquals(expected, Url.parse("http://host.com#fragment").path());
+  }
+
+  @Test public void parseRemovesDotSegments() {
+    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/").path());
+    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/.").path());
+    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/..").path());
+    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/../.").path());
+    assertEquals(Path.of("a/"), Url.parse("http://host.com/a/b/c/../..").path());
+    assertEquals(Path.of("a/b/file.html"), Url.parse("http://host.com/a/b/c/../file.html").path());
+
+    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/%2e").path());
+    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/%2E%2e").path());
+  }
+
+  @Test public void parseRemovesUrlEncodingInPath() {
+    Url url = Url.parse("http://host.com/docs/r%C3%A9sum%C3%A9.html");
+    assertEquals(Path.of("/docs/résumé.html"), url.path());
+    assertEquals(Arrays.asList("docs", "résumé.html"), url.path().segments());
+  }
+
+  @Test public void parseHandlesSlashesInBothDirections() {
+    assertEquals(Url.parse("http://host.com/a/b/"), Url.parse("http:\\\\host.com\\a\\b\\"));
   }
 
   private void assertInvalidParse(String url, String msg) {
