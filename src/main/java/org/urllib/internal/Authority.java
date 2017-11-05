@@ -35,7 +35,7 @@ public abstract class Authority {
     start++;
 
     if (start == end || start == lastColon) {
-      throw new IllegalArgumentException("Host cannot be empty. Input: " + authority);
+      throw new IllegalArgumentException("URL missing host. Input: " + authority);
     }
 
     if (numColons == 1) {

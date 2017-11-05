@@ -1,5 +1,6 @@
 package org.urllib;
 
+import java.util.Locale;
 import javax.annotation.Nonnull;
 
 public final class Scheme {
@@ -9,6 +10,16 @@ public final class Scheme {
 
   public static final Scheme HTTP = new Scheme("http", 80);
   public static final Scheme HTTPS = new Scheme("https", 443);
+
+  public static Scheme valueOf(String scheme) {
+    switch (scheme.toLowerCase(Locale.US)) {
+      case "http":
+        return HTTP;
+      case "https":
+        return HTTPS;
+    }
+    throw new IllegalArgumentException("Scheme must be http or https.");
+  }
 
   public Scheme(@Nonnull String name, int port) {
     this.name = name;

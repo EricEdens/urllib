@@ -113,7 +113,7 @@ public class SplitUrlTest {
     try {
       SplitUrl.split("http:");
     } catch (IllegalArgumentException expected) {
-      assertThat(expected.getMessage(), containsString("URL missing authority"));
+      assertThat(expected.getMessage(), containsString("missing host"));
     }
   }
 

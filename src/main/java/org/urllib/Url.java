@@ -7,8 +7,12 @@ import java.util.Map;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import org.urllib.internal.Authority;
+import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
 import org.urllib.internal.Port;
+import org.urllib.internal.SplitUrl;
+import org.urllib.internal.Strings;
+import org.urllib.internal.Type;
 
 /**
  * A <a href="https://en.wikipedia.org/wiki/URL">uniform resource locator (Url)</a> that is
@@ -76,6 +80,19 @@ public final class Url {
         .scheme(Scheme.HTTPS)
         .port(Scheme.HTTPS.defaultPort())
         .host(host);
+  }
+
+  @Nonnull public static Url parse(String url) {
+    SplitUrl split = SplitUrl.split(PercentDecoder.decodeUnreserved(url));
+    if (split.urlType() != Type.FULL) {
+      throw new IllegalArgumentException("URL must have a scheme and host. Eg: http://host.com/");
+    }
+
+    Builder builder = new Builder()
+        .scheme(Scheme.valueOf(split.scheme()))
+        .host(split.authority());
+
+    return builder.create();
   }
 
   /**
@@ -183,7 +200,7 @@ public final class Url {
   public static final class Builder {
 
     @Nonnull private Scheme scheme;
-    private int port;
+    private int port = -1;
     @Nonnull private Authority authority;
     @Nonnull private Path path = Path.empty();
     @Nonnull private Query query = Query.empty();
@@ -230,6 +247,9 @@ public final class Url {
     }
 
     public Url create() {
+      if (this.port == -1) {
+        this.port = scheme.defaultPort();
+      }
       return new Url(this);
     }
   }

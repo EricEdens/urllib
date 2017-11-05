@@ -28,9 +28,9 @@ public class AuthorityTest {
   }
 
   @Test public void failWhenHostIsEmpty() {
-    expectUrlException("", "Host cannot be empty");
-    expectUrlException(":", "Host cannot be empty");
-    expectUrlException("user@host.com@", "Host cannot be empty");
+    expectUrlException("", "missing host");
+    expectUrlException(":", "missing host");
+    expectUrlException("user@host.com@", "missing host");
   }
 
   @Test public void removeUserInfo() {

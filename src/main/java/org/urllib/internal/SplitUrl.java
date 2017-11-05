@@ -69,7 +69,7 @@ public abstract class SplitUrl {
     }
 
     if (start >= url.length()) {
-      throw new IllegalArgumentException("URL missing authority: " + url);
+      throw new IllegalArgumentException("URL missing host name: " + url);
     }
 
     Builder builder = null;
