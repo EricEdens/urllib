@@ -1,4 +1,4 @@
-# Urllib
+# ![Urllib](website/static/urllib.png)
 
 Urllib is a library that makes URL manipulation easy, fun, and safe!
 
@@ -7,6 +7,22 @@ Urllib is a library that makes URL manipulation easy, fun, and safe!
 - [x] Compliant with [RFC 3986](https://tools.ietf.org/html/rfc3986).
 - [x] Immutable and threadsafe.
 
+```java
+  System.out.println(
+      Url.http("maps.google.com")
+         .path("maps")
+         .query("q", "Búðardalur")
+         .create());
+
+  >> http://maps.google.com/maps?q=B%C3%BA%C3%B0ardalur
+
+  System.out.println(
+      Url.parse("https://www.wolframalpha.com/input/?i=%E2%88%9A-1")
+         .query()
+         .params());
+
+  >> {i=√-1}
+```
 
 ## We're in preview!
 
