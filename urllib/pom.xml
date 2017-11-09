@@ -10,6 +10,46 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>urllib</artifactId>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <version>1.16</version>
+        <executions>
+          <execution>
+            <id>java17</id>
+            <phase>test</phase>
+            <configuration>
+              <signature>
+                <groupId>org.codehaus.mojo.signature</groupId>
+                <artifactId>java17</artifactId>
+                <version>1.0</version>
+              </signature>
+            </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>android14</id>
+            <phase>test</phase>
+            <configuration>
+              <signature>
+                <groupId>net.sf.androidscents.signature</groupId>
+                <artifactId>android-api-level-14</artifactId>
+                <version>4.0_r4</version>
+              </signature>
+            </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>com.google.auto.value</groupId>
