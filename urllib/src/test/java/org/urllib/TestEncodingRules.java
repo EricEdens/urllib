@@ -19,7 +19,7 @@ public class TestEncodingRules {
 
   @BeforeClass
   public static void importRules() throws IOException {
-    Scanner scanner = new Scanner(Paths.get("website/static", "encode-set.tsv"));
+    Scanner scanner = new Scanner(Paths.get("src/main/resources", "encode-set.tsv"));
     // Throw away header.
     scanner.nextLine();
     while (scanner.hasNextLine()) {

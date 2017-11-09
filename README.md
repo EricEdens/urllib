@@ -1,5 +1,4 @@
-# ![Urllib](website/static/urllib.png)
-
+# urllib
 Urllib is a library that makes URL manipulation easy, fun, and safe!
 
 - [x] Zero extra dependencies.
