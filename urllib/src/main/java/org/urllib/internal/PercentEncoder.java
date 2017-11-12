@@ -5,6 +5,12 @@ public abstract class PercentEncoder {
   private static final CodepointMatcher safePath =
       CodepointMatcher.anyOf(EncodeRules.PATH);
 
+  private static final CodepointMatcher reEncodePath =
+      CodepointMatcher.anyOf(EncodeRules.PATH + "\\/;");
+
+  private static final CodepointMatcher reEncodeQuery =
+      CodepointMatcher.anyOf(EncodeRules.QUERY + "=?&+;");
+
   private static final CodepointMatcher safeQuery =
       CodepointMatcher.anyOf(EncodeRules.QUERY);
 
@@ -12,33 +18,55 @@ public abstract class PercentEncoder {
       CodepointMatcher.anyOf(EncodeRules.FRAGMENT);
 
   public static String encodePathSegment(String segment) {
-    return PercentEncoder.encode(segment, safePath, false);
+    return PercentEncoder.encode(segment, safePath, false, false);
   }
 
   public static String encodeQueryComponent(String component) {
-    return PercentEncoder.encode(component, safeQuery, true);
+    return PercentEncoder.encode(component, safeQuery, true, false);
   }
 
   public static String encodeQueryComponentNoPlusForSpace(String component) {
-    return PercentEncoder.encode(component, safeQuery, false);
+    return PercentEncoder.encode(component, safeQuery, false, false);
   }
 
   public static String encodeFragment(String fragment) {
-    return PercentEncoder.encode(fragment, safeFragment, false);
+    return PercentEncoder.encode(fragment, safeFragment, false, false);
+  }
+
+  public static String reEncodePath(String path) {
+    return PercentEncoder.encode(path, reEncodePath, false, true);
+  }
+
+  public static String reEncodeQuery(String query) {
+    return PercentEncoder.encode(query, reEncodeQuery, false, true);
+  }
+
+  public static String reEncodeFragment(String fragment) {
+    return PercentEncoder.encode(fragment, safeFragment, false, true);
   }
 
   private static final byte[] UPPER_HEX_DIGITS =
       {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
-  private static String encode(String src, CodepointMatcher safe, boolean spaceToPlus) {
+  private static String encode(String src, CodepointMatcher safe, boolean spaceToPlus,
+      boolean reEncode) {
     if (allSafe(src, safe)) {
       return src;
     }
     int p = 0;
     int[] codepoints = Strings.codePoints(src);
-    int[] dest = new int[maxEncodedSize(codepoints, safe)];
-    for (int codepoint : codepoints) {
-      if (spaceToPlus && codepoint == ' ') {
+    int[] dest = new int[maxEncodedSize(codepoints, safe, reEncode)];
+    for (int i = 0, len = codepoints.length; i < len; i++) {
+      int codepoint = codepoints[i];
+      if (reEncode && codepoint == '%') {
+        if (i < len - 2 && Hex.isHex(codepoints[i + 1]) && Hex.isHex(codepoints[i + 2])) {
+          dest[p++] = '%';
+        } else {
+          dest[p++] = '%';
+          dest[p++] = '2';
+          dest[p++] = '5';
+        }
+      } else if (spaceToPlus && codepoint == ' ') {
         dest[p++] = '+';
       } else if (!safe.matches(codepoint)) {
         p += encodeTo(codepoint, p, dest);
@@ -122,7 +150,7 @@ public abstract class PercentEncoder {
     }
   }
 
-  private static int maxEncodedSize(int[] codepoints, CodepointMatcher safe) {
+  private static int maxEncodedSize(int[] codepoints, CodepointMatcher safe, boolean reEncode) {
     int size = 0;
     for (int codepoint : codepoints) {
       if (safe.matches(codepoint)) {
@@ -141,4 +169,5 @@ public abstract class PercentEncoder {
     }
     return size;
   }
+
 }

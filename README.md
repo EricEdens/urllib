@@ -43,12 +43,12 @@ once we reach 1.0.
   - Support IDN hosts.
 - [x] 0.6
   - Create a `Url` by parsing.
-- [ ] 0.7
-  - Utility method to classify a potential URL. Is it junk? A protocol-relative URL? An absolute path?
+- [x] 0.7
+  - Utility method to create a `java.net.URI` from a previously-encoded `URL`.
 - [ ] 0.8
   - Resolve a possibly-relative link against an existing `Url` 
 - [ ] 0.9
-  - Utility method to canonicalize previously-encoded URLs.
+  - Utility method to classify a potential URL. Is it junk? A protocol-relative URL? An absolute path?
 - [ ] 1.0
   - Encode a `Url` to display to users (like in a web browser URL bar)
   

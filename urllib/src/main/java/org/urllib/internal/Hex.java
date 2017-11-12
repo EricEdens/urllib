@@ -21,4 +21,8 @@ public final class Hex {
       return -1;
     }
   }
+
+  public static boolean isHex(int i) {
+    return decodeHex(i) > -1;
+  }
 }

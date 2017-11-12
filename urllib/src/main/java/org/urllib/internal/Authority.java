@@ -51,6 +51,14 @@ public abstract class Authority {
     return new AutoValue_Authority(port, Host.forString(authority.substring(start, end)));
   }
 
+  @Override public String toString() {
+    if (port() > 0) {
+      return host().name() + ':' + port();
+    } else {
+      return host().name();
+    }
+  }
+
   private static int parseAndValidatePort(String authority, int lastColon) {
     return lastColon == authority.length() - 1
         ? -1

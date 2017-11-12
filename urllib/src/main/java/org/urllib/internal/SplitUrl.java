@@ -31,7 +31,11 @@ public abstract class SplitUrl {
     if (CodepointMatcher.ALPHA.matches(trim.charAt(0))) {
       builder = fullUrlOrRelativePath(trim);
     } else if (slash.matches(trim.charAt(0))) {
-      if (trim.length() > 1 && slash.matches(trim.charAt(1))) {
+      if (trim.length() == 2 && slash.matches(trim.charAt(1))) {
+        return SplitUrl.builder()
+            .urlType(Type.PROTOCOL_RELATIVE)
+            .build();
+      } else if (trim.length() > 1 && slash.matches(trim.charAt(1))) {
         builder = authority(trim, 0).urlType(Type.PROTOCOL_RELATIVE);
       } else {
         builder = path(trim, 0).urlType(Type.PATH_ABSOLUTE);
