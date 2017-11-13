@@ -1,6 +1,7 @@
 package org.urllib;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
@@ -27,7 +28,7 @@ import org.urllib.internal.Type;
  *   Url url = Url.https("www.wolframalpha.com")
  *                .path("input/")
  *                .query("i", "π²")
- *                .build();
+ *                .create();
  *
  *   System.out.println(url);
  * }</pre>
@@ -42,7 +43,8 @@ import org.urllib.internal.Type;
  *
  *   URI moliere = Url.http("wikipedia.org")
  *                    .path("wiki", "Molière")
- *                    .toURI();
+ *                    .create()
+ *                    .url();
  * }</pre>
  *
  * <p>The current implementation supports HTTP and HTTPS URLs, but future implementations may
@@ -161,6 +163,18 @@ public final class Url {
     return fragment;
   }
 
+  /**
+   * Returns this URL as a {@link java.net.URI}.
+   */
+  @Nonnull public URI uri() {
+    try {
+      return new URI(toString());
+    } catch (URISyntaxException e) {
+      // Reaching this point would mean a bug in our url encoding.
+      throw new AssertionError(
+          "Please file a bug at https://github.com/EricEdens/urllib/issues");
+    }
+  }
 
   @Override public boolean equals(Object o) {
     if (this == o) return true;

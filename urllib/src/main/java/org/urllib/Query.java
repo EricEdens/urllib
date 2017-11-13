@@ -88,10 +88,10 @@ public final class Query {
     StringBuilder sb = new StringBuilder();
     for (Iterator<KeyValue> iterator = params.iterator(); iterator.hasNext(); ) {
       KeyValue param = iterator.next();
-      sb.append(PercentEncoder.encodeQueryComponent(param.key()));
+      sb.append(PercentEncoder.encodeQueryComponentNoPlusForSpace(param.key()));
       if (param.value() != null && !param.value().isEmpty()) {
         sb.append('=')
-            .append(PercentEncoder.encodeQueryComponent(param.value()));
+            .append(PercentEncoder.encodeQueryComponentNoPlusForSpace(param.value()));
       }
       if (iterator.hasNext()) {
         sb.append('&');

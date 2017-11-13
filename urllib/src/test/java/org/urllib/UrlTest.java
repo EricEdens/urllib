@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -114,6 +115,54 @@ public class UrlTest {
         .fragment("\uD83D\uDC36")
         .create();
     assertEquals("\uD83D\uDC36", url.fragment().toString());
+  }
+
+  @Test public void uriInteropAllCodepoints() {
+    for (char point = 0; point < 0x100; point++) {
+      String input = "" + point;
+      Url url = Url.http("host.com")
+          .path("/" + input)
+          .query(input, input)
+          .fragment(input)
+          .create();
+
+      assertEquals(url.toString(), url.uri().toString());
+    }
+  }
+
+  @Test public void uriInteropSpaceAndPlus() {
+    Url url = Url.parse("http://site.com/c++?q=%2B+-");
+    URI uri = url.uri();
+    assertEquals("/c++", uri.getPath());
+    assertEquals("q=+ -", uri.getQuery());
+  }
+
+  @Test public void uriInteropUnicode() {
+    Url url = Url.parse("http://❄.com/❄?q=❄#❄");
+    URI uri = url.uri();
+    assertEquals("xn--tdi.com", uri.getHost());
+    assertEquals("/❄", uri.getPath());
+    assertEquals("q=❄", uri.getQuery());
+    assertEquals("❄", uri.getFragment());
+  }
+
+  @Test public void uriInteropHash() {
+    Url url = Url.http("host.com")
+        .path("/c#")
+        .query("q", "#!")
+        .fragment("#fragment#")
+        .create();
+    URI uri = url.uri();
+    assertEquals("/c#", uri.getPath());
+    assertEquals("q=#!", uri.getQuery());
+    assertEquals("#fragment#", uri.getFragment());
+  }
+
+  @Test public void uriInteropIpv6() {
+    Url url = Url.http("[ff::00]")
+        .create();
+    URI uri = url.uri();
+    assertEquals("[ff::]", uri.getHost());
   }
 
   @Test public void allowPortWithHost() {
