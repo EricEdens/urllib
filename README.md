@@ -25,9 +25,40 @@ Urllib is a library that makes URL manipulation easy, fun, and safe!
 
 ## We're in preview!
 
-Feel free to check out the code and give feedback! We're targeting a general release
-once we reach 1.0. 
+Feel free to check out the code and give feedback! The first stable release will be 1.0.
+In the meantime, builds are available on [jitpack](https://jitpack.io/#org.urllib/urllib):
 
+### Gradle
+
+```gradle
+   repositories {
+        jcenter()
+        maven { url 'https://jitpack.io' }
+   }
+
+   dependencies {
+         compile 'org.urllib:urllib:master-SNAPSHOT'
+   }
+```
+
+### Maven
+
+```maven
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.urllib</groupId>
+            <artifactId>urllib</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+```
 
 - [x] 0.1
   - Create a `Url` from scratch with builders.

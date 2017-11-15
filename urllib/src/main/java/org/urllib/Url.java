@@ -44,7 +44,7 @@ import org.urllib.internal.Type;
  *   URI moliere = Url.http("wikipedia.org")
  *                    .path("wiki", "Molière")
  *                    .create()
- *                    .url();
+ *                    .uri();
  * }</pre>
  *
  * <p>The current implementation supports HTTP and HTTPS URLs, but future implementations may
