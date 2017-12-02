@@ -18,9 +18,9 @@ public class UrlsFuzzTest {
   @Test public void minimalEscape() {
     for (int i = 0; i < RUN_LEN; i++) {
       int length = RAND.nextInt(20);
-      Urls.minimalEscape("http://host.com/" + UNFILTERED.generate(length));
-      Urls.minimalEscape("http://host.com/" + ASCII.generate(length));
-      Urls.minimalEscape("http://host.com/" + ASCII_PRINTABLE.generate(length));
+      Urls.escape("http://host.com/" + UNFILTERED.generate(length));
+      Urls.escape("http://host.com/" + ASCII.generate(length));
+      Urls.escape("http://host.com/" + ASCII_PRINTABLE.generate(length));
     }
   }
 

@@ -12,13 +12,13 @@ import org.junit.Test;
 public class UrlsTest {
 
   @Test public void minimalEscapeTrimsWhitespace() {
-    String expected = "ab";
-    assertEquals(expected, Urls.minimalEscape(" ab "));
-    assertEquals(expected, Urls.minimalEscape("   ab "));
-    assertEquals(expected, Urls.minimalEscape(" ab\n"));
-    assertEquals(expected, Urls.minimalEscape("\tab\n"));
-    assertEquals(expected, Urls.minimalEscape("\fab\n"));
-    assertEquals(expected, Urls.minimalEscape("\fab\n\r"));
+    String expected = "http://host";
+    assertEquals(expected, Urls.escape(" http://host "));
+    assertEquals(expected, Urls.escape("   http://host "));
+    assertEquals(expected, Urls.escape(" http://host\n"));
+    assertEquals(expected, Urls.escape("\thttp://host\n"));
+    assertEquals(expected, Urls.escape("\fhttp://host\n"));
+    assertEquals(expected, Urls.escape("\fhttp://host\n\r"));
   }
 
   @Test public void createURI() {
@@ -64,31 +64,31 @@ public class UrlsTest {
   }
 
   @Test public void minimalEscapeRemovesLineBreaks() {
-    String expected = "ab";
-    assertEquals(expected, Urls.minimalEscape("a\nb"));
-    assertEquals(expected, Urls.minimalEscape("a\n\rb"));
-    assertEquals(expected, Urls.minimalEscape("a\rb"));
-    assertEquals(expected, Urls.minimalEscape("a\r     b"));
-    assertEquals(expected, Urls.minimalEscape("a\n\tb"));
+    String expected = "http://host";
+    assertEquals(expected, Urls.escape("http://\nhost"));
+    assertEquals(expected, Urls.escape("http://\n\rhost"));
+    assertEquals(expected, Urls.escape("http://\rhost"));
+    assertEquals(expected, Urls.escape("http://\r     host"));
+    assertEquals(expected, Urls.escape("http://\n\thost"));
   }
 
   @Test public void minimalEncodeToLowerCase() {
-    assertEquals("http://host", Urls.minimalEscape("HTTP://host"));
+    assertEquals("http://host", Urls.escape("HTTP://host"));
   }
 
   @Test public void minimalEncodeHostname() {
-    assertEquals("http://xn--qei", Urls.minimalEscape("http://❤"));
-    assertEquals("http://host.com:9000", Urls.minimalEscape("http://user:password@host.com:9000"));
-    assertEquals("http://host.com", Urls.minimalEscape("http://HOST.com."));
-    assertEquals("http://192.168.1.1", Urls.minimalEscape("http://192.168.1.1"));
-    assertEquals("http://192.com", Urls.minimalEscape("http://192.com"));
-    assertEquals("http://192.com", Urls.minimalEscape("http://192%2ecom"));
-    assertEquals("http://[fa::dd]", Urls.minimalEscape("http://FA::0:dd"));
+    assertEquals("http://xn--qei", Urls.escape("http://❤"));
+    assertEquals("http://host.com:9000", Urls.escape("http://user:password@host.com:9000"));
+    assertEquals("http://host.com", Urls.escape("http://HOST.com."));
+    assertEquals("http://192.168.1.1", Urls.escape("http://192.168.1.1"));
+    assertEquals("http://192.com", Urls.escape("http://192.com"));
+    assertEquals("http://192.com", Urls.escape("http://192%2ecom"));
+    assertEquals("http://[fa::dd]", Urls.escape("http://FA::0:dd"));
   }
 
   @Test public void minimalEncodeChecksAuthority() {
     try {
-      Urls.minimalEscape("http://\\\\]/path");
+      Urls.escape("http://\\\\]/path");
       fail("Expected IllegalArgumentException");
     } catch (IllegalArgumentException expected) {
       assertThat(expected.getMessage(), containsString("Invalid hostname:"));
@@ -97,10 +97,18 @@ public class UrlsTest {
 
   @Test public void minimalEncodeFixColonSlashSlash() {
     String expected = "http://host";
-    assertEquals(expected, Urls.minimalEscape("http://////host"));
-    assertEquals(expected, Urls.minimalEscape("http:/host"));
-    assertEquals(expected, Urls.minimalEscape("http:\\host"));
-    assertEquals(expected, Urls.minimalEscape("http:\\\\host"));
+    assertEquals(expected, Urls.escape("http://////host"));
+    assertEquals(expected, Urls.escape("http:/host"));
+    assertEquals(expected, Urls.escape("http:\\host"));
+    assertEquals(expected, Urls.escape("http:\\\\host"));
+  }
+
+  @Test public void minimalEscape_retainPlusInPath() {
+    assertEquals("http://wikipedia.org/c++", Urls.escape("http://wikipedia.org/c++"));
+  }
+
+  @Test public void minimalEscape_retainPlusInQiuery() {
+    assertEquals("http://wikipedia.org/?q=c++", Urls.escape("http://wikipedia.org/?q=c++"));
   }
 
   @Test public void minimalEncodePath() {
@@ -151,7 +159,7 @@ public class UrlsTest {
     verifyEscaping("/,", "/,");
     verifyEscaping("/-", "/-");
     verifyEscaping("/.", "/.");
-    verifyEscaping("", "//");
+    verifyEscaping("/", "/");
     verifyEscaping("/0", "/0");
     verifyEscaping("/1", "/1");
     verifyEscaping("/2", "/2");
@@ -196,7 +204,7 @@ public class UrlsTest {
     verifyEscaping("/Y", "/Y");
     verifyEscaping("/Z", "/Z");
     verifyEscaping("/%5B", "/[");
-    verifyEscaping("", "/\\");
+    verifyEscaping("/", "\\");
     verifyEscaping("/%5D", "/]");
     verifyEscaping("/%5E", "/^");
     verifyEscaping("/_", "/_");
@@ -511,11 +519,13 @@ public class UrlsTest {
   }
 
   private void verifyEscaping(String expected, String input) {
+    expected = "http://host" + expected;
+    input = "http://host" + input;
     try {
       new URI(expected);
     } catch (URISyntaxException e) {
       throw new AssertionError(e);
     }
-    assertEquals(expected, Urls.minimalEscape(input));
+    assertEquals(expected, Urls.escape(input));
   }
 }

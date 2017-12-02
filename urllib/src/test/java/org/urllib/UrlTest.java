@@ -6,43 +6,41 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import org.junit.Test;
 import org.urllib.Query.KeyValue;
 
 public class UrlTest {
 
   @Test public void emptyPathIsAlwaysForwardSlash() {
-    Url expected = Url.http("host").path("/").create();
-    assertEquals(expected, Url.http("host").create());
-    assertEquals(expected, Url.http("host").path("").create());
-    assertEquals(expected, Url.http("host").path("\\").create());
+    Url expected = Urls.http("host").path("/").create();
+    assertEquals(expected, Urls.http("host").create());
+    assertEquals(expected, Urls.http("host").path("").create());
+    assertEquals(expected, Urls.http("host").path("\\").create());
   }
 
   @Test public void scheme() {
-    Url url = Url.http("host").create();
+    Url url = Urls.http("host").create();
     assertEquals(Scheme.HTTP, url.scheme());
 
-    url = Url.https("host").create();
+    url = Urls.https("host").create();
     assertEquals(Scheme.HTTPS, url.scheme());
   }
 
   @Test public void host() throws Exception {
-    Url url = Url.http("host").create();
+    Url url = Urls.http("host").create();
     assertEquals("host", url.host().toString());
 
-    url = Url.http("10.10.0.1:9000").create();
+    url = Urls.http("10.10.0.1:9000").create();
     assertEquals("10.10.0.1", url.host().toString());
 
-    url = Url.http("2001:0db8:0000:0000:0000:8a2e:0370:7334").create();
+    url = Urls.http("2001:0db8:0000:0000:0000:8a2e:0370:7334").create();
     assertEquals("2001:db8::8a2e:370:7334", url.host().toString());
 
-    url = Url.http("[2001:db8::8a2e:370:7334]").create();
+    url = Urls.http("[2001:db8::8a2e:370:7334]").create();
     assertEquals("2001:db8::8a2e:370:7334", url.host().toString());
 
-    url = Url.http("[::A]:9000").create();
+    url = Urls.http("[::A]:9000").create();
     assertEquals("::a", url.host().toString());
     assertEquals(9000, url.port());
   }
@@ -68,50 +66,50 @@ public class UrlTest {
   }
 
   @Test public void host_removesUserInfo() {
-    Url url = Url.http("user:password@host.com").create();
+    Url url = Urls.http("user:password@host.com").create();
     assertEquals("host.com", url.host().toString());
 
-    url = Url.http("user@domain.com:password@host.com").create();
+    url = Urls.http("user@domain.com:password@host.com").create();
     assertEquals("host.com", url.host().toString());
   }
 
   @Test public void host_convertCharactersToLowerCase() {
-    assertEquals("abcd", Url.http("ABCD").create().host().toString());
-    assertEquals("σ", Url.http("Σ").create().host().toString());
+    assertEquals("abcd", Urls.http("ABCD").create().host().toString());
+    assertEquals("σ", Urls.http("Σ").create().host().toString());
   }
 
   @Test public void host_idnEncodedAsPunycode() {
-    Url url = Url.http("bücher").create();
+    Url url = Urls.http("bücher").create();
     assertEquals("xn--bcher-kva", url.host().name());
     assertEquals("bücher", url.host().toString());
   }
 
   @Test public void host_builderTakesPunycodeOrUnicode() {
-    Url unicode = Url.http("bücher").create();
-    Url punycode = Url.http("xn--bcher-kva").create();
+    Url unicode = Urls.http("bücher").create();
+    Url punycode = Urls.http("xn--bcher-kva").create();
     assertEquals(unicode, punycode);
     assertEquals(unicode.hashCode(), punycode.hashCode());
   }
 
   @Test public void port() {
-    Url url = Url.http("host").create();
+    Url url = Urls.http("host").create();
     assertEquals(80, url.port());
 
-    url = Url.http("host:443").create();
+    url = Urls.http("host:443").create();
     assertEquals(443, url.port());
 
-    url = Url.http("host").port(8080).create();
+    url = Urls.http("host").port(8080).create();
     assertEquals(8080, url.port());
 
-    url = Url.https("host").create();
+    url = Urls.https("host").create();
     assertEquals(443, url.port());
 
-    url = Url.https("host:80").create();
+    url = Urls.https("host:80").create();
     assertEquals(80, url.port());
   }
 
   @Test public void fragment() {
-    Url url = Url.http("host")
+    Url url = Urls.http("host")
         .fragment("\uD83D\uDC36")
         .create();
     assertEquals("\uD83D\uDC36", url.fragment().toString());
@@ -120,7 +118,7 @@ public class UrlTest {
   @Test public void uriInteropAllCodepoints() {
     for (char point = 0; point < 0x100; point++) {
       String input = "" + point;
-      Url url = Url.http("host.com")
+      Url url = Urls.http("host.com")
           .path("/" + input)
           .query(input, input)
           .fragment(input)
@@ -131,14 +129,14 @@ public class UrlTest {
   }
 
   @Test public void uriInteropSpaceAndPlus() {
-    Url url = Url.parse("http://site.com/c++?q=%2B+-");
+    Url url = Urls.parse("http://site.com/c++?q=%2B+-");
     URI uri = url.uri();
     assertEquals("/c++", uri.getPath());
     assertEquals("q=+ -", uri.getQuery());
   }
 
   @Test public void uriInteropUnicode() {
-    Url url = Url.parse("http://❄.com/❄?q=❄#❄");
+    Url url = Urls.parse("http://❄.com/❄?q=❄#❄");
     URI uri = url.uri();
     assertEquals("xn--tdi.com", uri.getHost());
     assertEquals("/❄", uri.getPath());
@@ -147,7 +145,7 @@ public class UrlTest {
   }
 
   @Test public void uriInteropHash() {
-    Url url = Url.http("host.com")
+    Url url = Urls.http("host.com")
         .path("/c#")
         .query("q", "#!")
         .fragment("#fragment#")
@@ -159,19 +157,19 @@ public class UrlTest {
   }
 
   @Test public void uriInteropIpv6() {
-    Url url = Url.http("[ff::00]")
+    Url url = Urls.http("[ff::00]")
         .create();
     URI uri = url.uri();
     assertEquals("[ff::]", uri.getHost());
   }
 
   @Test public void allowPortWithHost() {
-    assertEquals(8080, Url.http("localhost:8080").create().port());
-    assertEquals(80, Url.https("localhost:80").create().port());
+    assertEquals(8080, Urls.http("localhost:8080").create().port());
+    assertEquals(80, Urls.https("localhost:80").create().port());
   }
 
   @Test public void trimWhitespaceBeforeParsing() {
-    assertEquals(Url.http("example.com").create(), Url.parse("  http://\nexample.\n  com  "));
+    assertEquals(Urls.http("example.com").create(), Urls.parse("  http://\nexample.\n  com  "));
   }
 
   @Test public void parseRequiresSchemeAndHost() {
@@ -192,20 +190,20 @@ public class UrlTest {
   }
 
   @Test public void parseSchemeIsCaseInsensitive() {
-    assertEquals(Scheme.HTTP, Url.parse("HTTP://host.com").scheme());
-    assertEquals(Scheme.HTTPS, Url.parse("HtTPs://host.com").scheme());
+    assertEquals(Scheme.HTTP, Urls.parse("HTTP://host.com").scheme());
+    assertEquals(Scheme.HTTPS, Urls.parse("HtTPs://host.com").scheme());
   }
 
   @Test public void parsePrefersPortFromInputString() {
-    assertEquals(443, Url.parse("https://host.com").port());
-    assertEquals(80, Url.parse("http://host.com").port());
+    assertEquals(443, Urls.parse("https://host.com").port());
+    assertEquals(80, Urls.parse("http://host.com").port());
 
-    assertEquals(9000, Url.parse("http://host.com:9000").port());
-    assertEquals(443, Url.parse("http://host.com:443").port());
-    assertEquals(80, Url.parse("https://host.com:80").port());
+    assertEquals(9000, Urls.parse("http://host.com:9000").port());
+    assertEquals(443, Urls.parse("http://host.com:443").port());
+    assertEquals(80, Urls.parse("https://host.com:80").port());
 
-    assertEquals(8080, Url.parse("http://[a::443]:8080").port());
-    assertEquals(8080, Url.parse("http://1.1.1.1:8080").port());
+    assertEquals(8080, Urls.parse("http://[a::443]:8080").port());
+    assertEquals(8080, Urls.parse("http://1.1.1.1:8080").port());
   }
 
   @Test public void parseValidatesPort() {
@@ -232,62 +230,62 @@ public class UrlTest {
   }
 
   @Test public void parseConvertsDnsHostToLowerCase() {
-    assertEquals("host.com", Url.parse("http://HOST.com").host().name());
-    assertEquals("host.com", Url.parse("http://HoSt.COM").host().name());
+    assertEquals("host.com", Urls.parse("http://HOST.com").host().name());
+    assertEquals("host.com", Urls.parse("http://HoSt.COM").host().name());
   }
 
   @Test public void parseCompressesIpv6() {
-    assertEquals("[a::1]", Url.parse("http://[a:0:0:0:0:0:0:1]").host().name());
-    assertEquals("[ff::]", Url.parse("http://[FF::0:0]").host().name());
-    assertEquals("[::a:b:0:0:0]", Url.parse("http://[0:0:0:a:b:00:000:0]").host().name());
+    assertEquals("[a::1]", Urls.parse("http://[a:0:0:0:0:0:0:1]").host().name());
+    assertEquals("[ff::]", Urls.parse("http://[FF::0:0]").host().name());
+    assertEquals("[::a:b:0:0:0]", Urls.parse("http://[0:0:0:a:b:00:000:0]").host().name());
   }
 
   @Test public void parseAlwaysReturnsUrlWithPath() {
     Path expected = Path.empty();
-    assertEquals(expected, Url.parse("http://host.com").path());
-    assertEquals(expected, Url.parse("http://host.com/").path());
-    assertEquals(expected, Url.parse("http://host.com?query").path());
-    assertEquals(expected, Url.parse("http://host.com#fragment").path());
+    assertEquals(expected, Urls.parse("http://host.com").path());
+    assertEquals(expected, Urls.parse("http://host.com/").path());
+    assertEquals(expected, Urls.parse("http://host.com?query").path());
+    assertEquals(expected, Urls.parse("http://host.com#fragment").path());
   }
 
   @Test public void parseRemovesDotSegmentsInPath() {
-    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/").path());
-    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/.").path());
-    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/..").path());
-    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/../.").path());
-    assertEquals(Path.of("a/"), Url.parse("http://host.com/a/b/c/../..").path());
-    assertEquals(Path.of("a/b/file.html"), Url.parse("http://host.com/a/b/c/../file.html").path());
+    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/").path());
+    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/.").path());
+    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/c/..").path());
+    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/c/../.").path());
+    assertEquals(Path.of("a/"), Urls.parse("http://host.com/a/b/c/../..").path());
+    assertEquals(Path.of("a/b/file.html"), Urls.parse("http://host.com/a/b/c/../file.html").path());
 
-    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/%2e").path());
-    assertEquals(Path.of("a/b/"), Url.parse("http://host.com/a/b/c/%2E%2e").path());
+    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/%2e").path());
+    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/c/%2E%2e").path());
   }
 
   @Test public void parseRemovesEmptyQueryValues() {
     Query expected = Query.of(Arrays.asList(KeyValue.create("k", "")));
-    assertEquals(expected, Url.parse("http://host.com?k=").query());
-    assertEquals(expected, Url.parse("http://host.com?k").query());
+    assertEquals(expected, Urls.parse("http://host.com?k=").query());
+    assertEquals(expected, Urls.parse("http://host.com?k").query());
   }
 
   @Test public void parseRetainsDuplicateKeysInQuery() {
     Query expected = Query.of(
         Arrays.asList(KeyValue.create("k", "a"), KeyValue.create("k", "b")));
-    assertEquals(expected, Url.parse("http://host.com?k=a&k=b").query());
+    assertEquals(expected, Urls.parse("http://host.com?k=a&k=b").query());
   }
 
   @Test public void parseRemovesPercentEncoding() {
-    Url decoded = Url.parse("http://host.com/docs/résumé.html?q=\uD83D\uDC3C#\uD83D\uDE03");
-    Url encoded = Url.parse("http://host.com/docs/r%C3%A9sum%C3%A9.html?q=%F0%9F%90%BC#%F0%9F%98%83");
+    Url decoded = Urls.parse("http://host.com/docs/résumé.html?q=\uD83D\uDC3C#\uD83D\uDE03");
+    Url encoded = Urls.parse("http://host.com/docs/r%C3%A9sum%C3%A9.html?q=%F0%9F%90%BC#%F0%9F%98%83");
     assertEquals(decoded, encoded);
     assertEquals(decoded, encoded);
   }
 
   @Test public void parseHandlesSlashesInBothDirections() {
-    assertEquals(Url.parse("http://host.com/a/b/"), Url.parse("http:\\\\host.com\\a\\b\\"));
+    assertEquals(Urls.parse("http://host.com/a/b/"), Urls.parse("http:\\\\host.com\\a\\b\\"));
   }
 
   private void assertInvalidParse(String url, String msg) {
     try {
-      Url.parse(url);
+      Urls.parse(url);
       fail("Expected IllegalArgumentException for: " + url);
     } catch (IllegalArgumentException expected) {
       if (!expected.getMessage().contains(msg)) {
@@ -298,7 +296,7 @@ public class UrlTest {
 
   private void assertInvalidHost(String host, String msg) {
     try {
-      Url.http(host);
+      Urls.http(host);
       fail("Expected IllegalArgumentException for: " + host);
     } catch (IllegalArgumentException expected) {
       assertThat(expected.getMessage(), containsString(msg));

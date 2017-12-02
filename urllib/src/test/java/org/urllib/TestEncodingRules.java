@@ -34,7 +34,7 @@ public class TestEncodingRules {
   @Test public void pathObjectFromUrlBuilder() {
     Function<String, String> codepoint = new Function<String, String>() {
       @Override public String apply(String codepoint) {
-        Url url = Url.http("host.com").path("_" + codepoint).create();
+        Url url = Urls.http("host.com").path("_" + codepoint).create();
         String path = url.path().toString();
         return path.substring(2, path.length());
       }
@@ -45,7 +45,7 @@ public class TestEncodingRules {
   @Test public void pathFromUrlBuilder() {
     Function<String, String> codepoint = new Function<String, String>() {
       @Override public String apply(String codepoint) {
-        Url url = Url.http("host.com").path("_" + codepoint).create();
+        Url url = Urls.http("host.com").path("_" + codepoint).create();
         return url.toString().replace("http://host.com/_", "");
       }
     };
@@ -55,7 +55,7 @@ public class TestEncodingRules {
   @Test public void queryObjectFromUrlBuilder() {
     Function<String, String> codepoint = new Function<String, String>() {
       @Override public String apply(String codepoint) {
-        Url url = Url.http("host.com").query("key", codepoint).create();
+        Url url = Urls.http("host.com").query("key", codepoint).create();
         return url.query().toString().replace("key=", "");
       }
     };
@@ -65,7 +65,7 @@ public class TestEncodingRules {
   @Test public void queryFromUrlBuilder() {
     Function<String, String> codepoint = new Function<String, String>() {
       @Override public String apply(String codepoint) {
-        Url url = Url.http("host.com").query("key", codepoint).create();
+        Url url = Urls.http("host.com").query("key", codepoint).create();
         return url.toString().replace("http://host.com/?key=", "");
       }
     };
@@ -75,7 +75,7 @@ public class TestEncodingRules {
   @Test public void fragmentFromBuilder() {
     Function<String, String> codepoint = new Function<String, String>() {
       @Override public String apply(String codepoint) {
-        Url url = Url.http("host.com").fragment(codepoint).create();
+        Url url = Urls.http("host.com").fragment(codepoint).create();
         return url.toString().replace("http://host.com/#", "");
       }
     };

@@ -70,45 +70,6 @@ public final class Url {
     this.fragment = builder.fragment;
   }
 
-  public static Builder http(String host) {
-    return new Builder()
-        .scheme(Scheme.HTTP)
-        .port(Scheme.HTTP.defaultPort())
-        .host(host);
-  }
-
-  public static Builder https(String host) {
-    return new Builder()
-        .scheme(Scheme.HTTPS)
-        .port(Scheme.HTTPS.defaultPort())
-        .host(host);
-  }
-
-  @Nonnull public static Url parse(String url) {
-    SplitUrl split = SplitUrl.split(Strings.sanitizeWhitespace(url));
-    if (split.urlType() != Type.FULL) {
-      throw new IllegalArgumentException("URL must have a scheme and host. Eg: http://host.com/");
-    }
-
-    Builder builder = new Builder()
-        .scheme(Scheme.valueOf(split.scheme()))
-        .host(split.authority());
-
-    if (!Strings.isNullOrEmpty(split.path())) {
-      builder.path(Path.parse(split.path()));
-    }
-
-    if (!Strings.isNullOrEmpty(split.query())) {
-      builder.query(Query.parse(split.query()));
-    }
-
-    if (!Strings.isNullOrEmpty(split.fragment())) {
-      builder.fragment(PercentDecoder.decodeAll(split.fragment()));
-    }
-
-    return builder.create();
-  }
-
   /**
    * Returns the Url's scheme.
    *
@@ -232,9 +193,9 @@ public final class Url {
     @Nonnull private Query query = Query.empty();
     @Nonnull private String fragment = "";
 
-    private Builder() {}
+    Builder() {}
 
-    private Builder scheme(Scheme scheme) {
+    Builder scheme(Scheme scheme) {
       this.scheme = scheme;
       return this;
     }
@@ -244,7 +205,7 @@ public final class Url {
       return this;
     }
 
-    private Builder host(String host) {
+    Builder host(String host) {
       this.authority = Authority.split(host);
       if (this.authority.port() != -1) {
         port(authority.port());
@@ -257,7 +218,7 @@ public final class Url {
       return this;
     }
 
-    private Builder path(Path path) {
+    Builder path(Path path) {
       this.path = path;
       return this;
     }
@@ -272,7 +233,7 @@ public final class Url {
       return this;
     }
 
-    private Builder query(Query query) {
+    Builder query(Query query) {
       this.query = query;
       return this;
     }

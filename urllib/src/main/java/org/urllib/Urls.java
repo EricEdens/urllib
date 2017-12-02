@@ -4,10 +4,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import javax.annotation.Nonnull;
+import org.urllib.Url.Builder;
 import org.urllib.internal.Authority;
+import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
 import org.urllib.internal.SplitUrl;
 import org.urllib.internal.Strings;
+import org.urllib.internal.Type;
 
 /**
  * This class consists of {@code static} utility methods for operating
@@ -120,24 +123,23 @@ public final class Urls {
    * not valid ASCII DNS, IDN, IPv4, or IPv6; or the port is invalid.
    */
   @Nonnull public static URI createURI(@Nonnull String fullUrl) {
-    String escaped = minimalEscape(fullUrl);
+    String escaped = escape(fullUrl);
 
-    if (escaped.startsWith("http://") || escaped.startsWith("https://")) {
-      try {
-        return new URI(escaped);
-      } catch (URISyntaxException e) {
-        throw new AssertionError(e);
-      }
-    } else {
-      throw new IllegalArgumentException("Only http and https URLs are supported.");
+    try {
+      return new URI(escaped);
+    } catch (URISyntaxException e) {
+      throw new AssertionError(e);
     }
   }
 
-  @Nonnull static String minimalEscape(@Nonnull String url) {
-    if (url.isEmpty()) return "";
-
+  @Nonnull public static String escape(@Nonnull String url) {
     String trim = Strings.sanitizeWhitespace(url);
     SplitUrl split = SplitUrl.split(trim);
+
+    if (split.urlType() != Type.FULL) {
+      throw new IllegalArgumentException(
+          "Not a full URL: " + url);
+    }
 
     StringBuilder sb = new StringBuilder();
 
@@ -168,6 +170,45 @@ public final class Urls {
     }
 
     return sb.toString();
+  }
+
+  public static Builder http(String host) {
+    return new Builder()
+        .scheme(Scheme.HTTP)
+        .port(Scheme.HTTP.defaultPort())
+        .host(host);
+  }
+
+  public static Builder https(String host) {
+    return new Builder()
+        .scheme(Scheme.HTTPS)
+        .port(Scheme.HTTPS.defaultPort())
+        .host(host);
+  }
+
+  @Nonnull public static Url parse(String url) {
+    SplitUrl split = SplitUrl.split(Strings.sanitizeWhitespace(url));
+    if (split.urlType() != Type.FULL) {
+      throw new IllegalArgumentException("URL must have a scheme and host. Eg: http://host.com/");
+    }
+
+    Builder builder = new Builder()
+        .scheme(Scheme.valueOf(split.scheme()))
+        .host(split.authority());
+
+    if (!Strings.isNullOrEmpty(split.path())) {
+      builder.path(Path.parse(split.path()));
+    }
+
+    if (!Strings.isNullOrEmpty(split.query())) {
+      builder.query(Query.parse(split.query()));
+    }
+
+    if (!Strings.isNullOrEmpty(split.fragment())) {
+      builder.fragment(PercentDecoder.decodeAll(split.fragment()));
+    }
+
+    return builder.create();
   }
 
   private Urls() {}
