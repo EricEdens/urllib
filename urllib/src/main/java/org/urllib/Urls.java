@@ -4,10 +4,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import javax.annotation.Nonnull;
-import org.urllib.Url.Builder;
 import org.urllib.internal.Authority;
 import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
+import org.urllib.internal.Scheme;
 import org.urllib.internal.SplitUrl;
 import org.urllib.internal.Strings;
 import org.urllib.internal.Type;
@@ -172,15 +172,15 @@ public final class Urls {
     return sb.toString();
   }
 
-  public static Builder http(String host) {
-    return new Builder()
+  public static UrlBuilder http(String host) {
+    return new UrlBuilder()
         .scheme(Scheme.HTTP)
         .port(Scheme.HTTP.defaultPort())
         .host(host);
   }
 
-  public static Builder https(String host) {
-    return new Builder()
+  public static UrlBuilder https(String host) {
+    return new UrlBuilder()
         .scheme(Scheme.HTTPS)
         .port(Scheme.HTTPS.defaultPort())
         .host(host);
@@ -192,7 +192,7 @@ public final class Urls {
       throw new IllegalArgumentException("URL must have a scheme and host. Eg: http://host.com/");
     }
 
-    Builder builder = new Builder()
+    UrlBuilder builder = new UrlBuilder()
         .scheme(Scheme.valueOf(split.scheme()))
         .host(split.authority());
 

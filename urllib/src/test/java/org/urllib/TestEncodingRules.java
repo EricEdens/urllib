@@ -10,6 +10,7 @@ import java.util.Scanner;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.urllib.internal.EncodeRules;
+import org.urllib.internal.UrllibUrl;
 
 public class TestEncodingRules {
 

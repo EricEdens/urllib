@@ -27,10 +27,6 @@ public final class Strings {
     return s == null || s.isEmpty();
   }
 
-  public static String emptyToNull(String s) {
-    return s == null ? "" : s;
-  }
-
   public static String nullToEmpty(String value) {
     return value == null ? "" : value;
   }
