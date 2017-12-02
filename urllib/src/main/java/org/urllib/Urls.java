@@ -173,17 +173,11 @@ public final class Urls {
   }
 
   public static UrlBuilder http(String host) {
-    return new UrlBuilder()
-        .scheme(Scheme.HTTP)
-        .port(Scheme.HTTP.defaultPort())
-        .host(host);
+    return new UrlBuilder(Scheme.HTTP, host);
   }
 
   public static UrlBuilder https(String host) {
-    return new UrlBuilder()
-        .scheme(Scheme.HTTPS)
-        .port(Scheme.HTTPS.defaultPort())
-        .host(host);
+    return new UrlBuilder(Scheme.HTTPS, host);
   }
 
   @Nonnull public static Url parse(String url) {
@@ -192,9 +186,7 @@ public final class Urls {
       throw new IllegalArgumentException("URL must have a scheme and host. Eg: http://host.com/");
     }
 
-    UrlBuilder builder = new UrlBuilder()
-        .scheme(Scheme.valueOf(split.scheme()))
-        .host(split.authority());
+    UrlBuilder builder = new UrlBuilder(Scheme.valueOf(split.scheme()), split.authority());
 
     if (!Strings.isNullOrEmpty(split.path())) {
       builder.path(Path.parse(split.path()));

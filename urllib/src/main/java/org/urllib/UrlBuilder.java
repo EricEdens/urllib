@@ -8,32 +8,42 @@ import org.urllib.internal.Port;
 import org.urllib.internal.Scheme;
 import org.urllib.internal.UrllibUrl;
 
+/**
+ * Use the builder to create a {@link Url} from scratch.  For example, this code creates a search
+ * for Wolfram Alpha using fancy unicode characters:<pre>{@code
+ *
+ *   Url url = Urls.https("www.wolframalpha.com")
+ *                 .path("input/")
+ *                 .query("i", "π²")
+ *                 .create();
+ *
+ *   System.out.println(url);
+ * }</pre>
+ *
+ * which prints: <a href="https://www.wolframalpha.com/input/?i=%CF%80%C2%B2">
+ * <code>https://www.wolframalpha.com/input/?i=%CF%80%C2%B2</code></a>
+ *
+ * @since 1.0
+ */
 public final class UrlBuilder {
 
-  @Nonnull Scheme scheme;
+  @Nonnull final Scheme scheme;
   int port = -1;
-  @Nonnull Authority authority;
+  @Nonnull final Authority authority;
   @Nonnull Path path = Path.empty();
   @Nonnull Query query = Query.empty();
   @Nonnull String fragment = "";
 
-  UrlBuilder() {}
-
-  UrlBuilder scheme(Scheme scheme) {
+  UrlBuilder(@Nonnull Scheme scheme, @Nonnull String host) {
     this.scheme = scheme;
-    return this;
+    this.authority = Authority.split(host);
+    if (authority.port() != -1) {
+      port(authority.port());
+    }
   }
 
   public UrlBuilder port(int port) {
     this.port = Port.validateOrThrow(port);
-    return this;
-  }
-
-  UrlBuilder host(String host) {
-    this.authority = Authority.split(host);
-    if (this.authority.port() != -1) {
-      port(authority.port());
-    }
     return this;
   }
 
