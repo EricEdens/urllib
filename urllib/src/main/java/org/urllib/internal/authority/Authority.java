@@ -1,4 +1,4 @@
-package org.urllib.internal;
+package org.urllib.internal.authority;
 
 import com.google.auto.value.AutoValue;
 import org.urllib.Host;

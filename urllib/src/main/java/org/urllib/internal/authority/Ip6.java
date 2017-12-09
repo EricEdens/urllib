@@ -1,4 +1,4 @@
-package org.urllib.internal;
+package org.urllib.internal.authority;
 
 import com.google.auto.value.AutoValue;
 import org.urllib.Host;
@@ -154,10 +154,7 @@ abstract class Ip6 implements Host {
         sb.append(':');
       }
     }
-    return create(sb.toString());
-  }
-
-  private static Ip6 create(String noBrackets) {
+    String noBrackets = sb.toString();
     return new AutoValue_Ip6('[' + noBrackets + ']', noBrackets);
   }
 

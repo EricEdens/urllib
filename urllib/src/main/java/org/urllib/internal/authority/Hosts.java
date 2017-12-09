@@ -1,18 +1,13 @@
-package org.urllib.internal;
+package org.urllib.internal.authority;
 
 import java.net.IDN;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.urllib.Host;
+import org.urllib.internal.PercentDecoder;
 
-public final class Hosts {
+final class Hosts {
 
-  private static final Pattern EMPTY_SEGMENT = Pattern.compile("^\\.|\\.{2}");
-
-  private static final CodepointMatcher DNS_OR_IPV6 = CodepointMatcher.or(
-      CodepointMatcher.ALPHANUMERIC, CodepointMatcher.anyOf("-.[]:%"));
-
-  @Nonnull public static Host parse(String hostname) {
+  @Nonnull static Host parse(String hostname) {
     String ascii = validateAndConvertToAscii(hostname);
 
     Host host;
@@ -37,18 +32,6 @@ public final class Hosts {
   }
 
   private static String validateAndConvertToAscii(String hostname) {
-    if (Strings.isNullOrEmpty(hostname)
-        || EMPTY_SEGMENT.matcher(hostname).find()) {
-      throw new IllegalArgumentException("Invalid hostname: " + hostname);
-    }
-
-    for (int i = 0; i < hostname.length(); i++) {
-      char c = hostname.charAt(i);
-      if (c < 0x80 && !DNS_OR_IPV6.matches(c)) {
-        throw new IllegalArgumentException("Invalid hostname: Illegal char at index " + i);
-      }
-    }
-
     String ascii;
     try {
       ascii = IDN.toASCII(PercentDecoder.decodeUnreserved(hostname), IDN.ALLOW_UNASSIGNED);
@@ -56,7 +39,7 @@ public final class Hosts {
       throw new IllegalArgumentException("Invalid hostname: " + hostname);
     }
 
-    if (".".equals(ascii)) {
+    if (ascii.isEmpty() || ".".equals(ascii)) {
       throw new IllegalArgumentException("Invalid hostname: cannot be null or empty.");
     }
 

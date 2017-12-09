@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import javax.annotation.Nonnull;
-import org.urllib.internal.Authority;
+import org.urllib.internal.authority.Authority;
 import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
 import org.urllib.internal.Scheme;

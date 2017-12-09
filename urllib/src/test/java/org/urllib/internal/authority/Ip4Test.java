@@ -1,4 +1,4 @@
-package org.urllib.internal;
+package org.urllib.internal.authority;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -53,7 +53,7 @@ public class Ip4Test {
   }
 
 
-  private void assertInvalid(String host) {
+  private static void assertInvalid(String host) {
     try {
       Hosts.parse(host);
       fail("Expected IllegalArgumentException for: " + host);

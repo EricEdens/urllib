@@ -1,4 +1,4 @@
-package org.urllib.internal;
+package org.urllib.internal.authority;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.urllib.internal.authority.Hosts;
 
 public class Ip6Test {
 

@@ -1,10 +1,9 @@
-package org.urllib.internal;
+package org.urllib.internal.authority;
 
 public class Port {
 
   private static final int MIN_PORT = 1;
   private static final int MAX_PORT = (2 << 15) - 1;
-
 
   public static int validateOrThrow(String portString) {
     int port;

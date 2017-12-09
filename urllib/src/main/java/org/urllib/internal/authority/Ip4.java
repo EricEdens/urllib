@@ -1,8 +1,9 @@
-package org.urllib.internal;
+package org.urllib.internal.authority;
 
 import com.google.auto.value.AutoValue;
 import javax.annotation.Nullable;
 import org.urllib.Host;
+import org.urllib.internal.CodepointMatcher;
 
 @AutoValue
 abstract class Ip4 implements Host {

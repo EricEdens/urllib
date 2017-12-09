@@ -3,8 +3,8 @@ package org.urllib;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.urllib.internal.Authority;
-import org.urllib.internal.Port;
+import org.urllib.internal.authority.Authority;
+import org.urllib.internal.authority.Port;
 import org.urllib.internal.Scheme;
 import org.urllib.internal.UrllibUrl;
 
