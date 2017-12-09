@@ -31,19 +31,19 @@ public class UrlsTest {
 
   @Test public void host() throws Exception {
     Url url = Urls.http("host").create();
-    assertEquals("host", url.host().toString());
+    assertEquals("host", url.host().display());
 
     url = Urls.http("10.10.0.1:9000").create();
-    assertEquals("10.10.0.1", url.host().toString());
+    assertEquals("10.10.0.1", url.host().display());
 
     url = Urls.http("2001:0db8:0000:0000:0000:8a2e:0370:7334").create();
-    assertEquals("2001:db8::8a2e:370:7334", url.host().toString());
+    assertEquals("2001:db8::8a2e:370:7334", url.host().display());
 
     url = Urls.http("[2001:db8::8a2e:370:7334]").create();
-    assertEquals("2001:db8::8a2e:370:7334", url.host().toString());
+    assertEquals("2001:db8::8a2e:370:7334", url.host().display());
 
     url = Urls.http("[::A]:9000").create();
-    assertEquals("::a", url.host().toString());
+    assertEquals("::a", url.host().display());
     assertEquals(9000, url.port());
   }
 
@@ -69,21 +69,21 @@ public class UrlsTest {
 
   @Test public void host_removesUserInfo() {
     Url url = Urls.http("user:password@host.com").create();
-    assertEquals("host.com", url.host().toString());
+    assertEquals("host.com", url.host().display());
 
     url = Urls.http("user@domain.com:password@host.com").create();
-    assertEquals("host.com", url.host().toString());
+    assertEquals("host.com", url.host().display());
   }
 
   @Test public void host_convertCharactersToLowerCase() {
-    assertEquals("abcd", Urls.http("ABCD").create().host().toString());
-    assertEquals("σ", Urls.http("Σ").create().host().toString());
+    assertEquals("abcd", Urls.http("ABCD").create().host().display());
+    assertEquals("σ", Urls.http("Σ").create().host().display());
   }
 
   @Test public void host_idnEncodedAsPunycode() {
     Url url = Urls.http("bücher").create();
     assertEquals("xn--bcher-kva", url.host().name());
-    assertEquals("bücher", url.host().toString());
+    assertEquals("bücher", url.host().display());
   }
 
   @Test public void host_builderTakesPunycodeOrUnicode() {

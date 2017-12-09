@@ -48,7 +48,7 @@ public abstract class Authority {
       }
     }
 
-    return new AutoValue_Authority(port, Host.forString(authority.substring(start, end)));
+    return new AutoValue_Authority(port, Hosts.parse(authority.substring(start, end)));
   }
 
   @Override public String toString() {

@@ -22,9 +22,9 @@ public class AuthorityTest {
   }
 
   @Test public void supportUnicodePeriods() {
-    assertEquals("host.com", Authority.split("host。com").host().toString());
-    assertEquals("host.com", Authority.split("host．com").host().toString());
-    assertEquals("host.com", Authority.split("host｡com").host().toString());
+    assertEquals("host.com", Authority.split("host。com").host().display());
+    assertEquals("host.com", Authority.split("host．com").host().display());
+    assertEquals("host.com", Authority.split("host｡com").host().display());
   }
 
   @Test public void failWhenHostIsEmpty() {
@@ -34,9 +34,9 @@ public class AuthorityTest {
   }
 
   @Test public void removeUserInfo() {
-    assertEquals("host.com", Authority.split("user@host.com").host().toString());
-    assertEquals("host.com", Authority.split("user@host.com@host.com").host().toString());
-    assertEquals("host.com", Authority.split("user@host.com@host.com:80").host().toString());
+    assertEquals("host.com", Authority.split("user@host.com").host().display());
+    assertEquals("host.com", Authority.split("user@host.com@host.com").host().display());
+    assertEquals("host.com", Authority.split("user@host.com@host.com:80").host().display());
   }
 
   @Test public void rejectInvalidPorts() {
