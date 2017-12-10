@@ -57,7 +57,7 @@ public class TestEncodingRules {
     Function<String, String> codepoint = new Function<String, String>() {
       @Override public String apply(String codepoint) {
         Url url = Urls.http("host.com").query("key", codepoint).create();
-        return url.query().toString().replace("key=", "");
+        return url.query().encoded().replace("key=", "");
       }
     };
     run(codepoint, QUERY);

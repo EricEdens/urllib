@@ -3,6 +3,7 @@ package org.urllib;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import org.urllib.internal.Queries;
 import org.urllib.internal.authority.Authority;
 import org.urllib.internal.authority.Port;
 import org.urllib.internal.Scheme;
@@ -31,7 +32,7 @@ public final class UrlBuilder {
   int port = -1;
   @Nonnull final Authority authority;
   @Nonnull Path path = Path.empty();
-  @Nonnull Query query = Query.empty();
+  @Nonnull Query query = Queries.empty();
   @Nonnull String fragment = "";
 
   UrlBuilder(@Nonnull Scheme scheme, @Nonnull String host) {
@@ -58,12 +59,12 @@ public final class UrlBuilder {
   }
 
   public UrlBuilder query(String key, String value) {
-    this.query = Query.create(Collections.singletonMap(key, value));
+    this.query = Queries.create(Collections.singletonMap(key, value));
     return this;
   }
 
   public UrlBuilder query(Map<String, String> query) {
-    this.query = Query.create(query);
+    this.query = Queries.create(query);
     return this;
   }
 

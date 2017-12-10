@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import javax.annotation.Nonnull;
+import org.urllib.internal.Queries;
 import org.urllib.internal.authority.Authority;
 import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
@@ -193,7 +194,7 @@ public final class Urls {
     }
 
     if (!Strings.isNullOrEmpty(split.query())) {
-      builder.query(Query.parse(split.query()));
+      builder.query(Queries.parse(split.query()));
     }
 
     if (!Strings.isNullOrEmpty(split.fragment())) {

@@ -44,7 +44,7 @@ public abstract class UrllibUrl implements Url {
     sb.append(path());
 
     if (!query().isEmpty()) {
-      sb.append('?').append(query());
+      sb.append('?').append(query().encoded());
     }
 
     if (!fragment().isEmpty()) {

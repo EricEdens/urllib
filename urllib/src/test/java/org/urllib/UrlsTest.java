@@ -9,7 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import org.junit.Test;
-import org.urllib.Query.KeyValue;
+import org.urllib.internal.Queries;
 import org.urllib.internal.Scheme;
 
 public class UrlsTest {
@@ -263,14 +263,14 @@ public class UrlsTest {
   }
 
   @Test public void parseRemovesEmptyQueryValues() {
-    Query expected = Query.of(Arrays.asList(KeyValue.create("k", "")));
+    Query expected = Queries.of(Arrays.asList(Queries.create("k", "")));
     assertEquals(expected, Urls.parse("http://host.com?k=").query());
     assertEquals(expected, Urls.parse("http://host.com?k").query());
   }
 
   @Test public void parseRetainsDuplicateKeysInQuery() {
-    Query expected = Query.of(
-        Arrays.asList(KeyValue.create("k", "a"), KeyValue.create("k", "b")));
+    Query expected = Queries.of(
+        Arrays.asList(Queries.create("k", "a"), Queries.create("k", "b")));
     assertEquals(expected, Urls.parse("http://host.com?k=a&k=b").query());
   }
 
