@@ -1,4 +1,4 @@
-package org.urllib;
+package org.urllib.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,9 +7,47 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import org.junit.Test;
-import org.urllib.internal.Paths;
+import org.urllib.Path;
 
-public class PathTest {
+public class PathsTest {
+
+  @Test public void resolve() {
+    assertEquals(Paths.parse("/home/file.pdf"),
+        Paths.parse("/home/dir").resolve("file.pdf"));
+
+    assertEquals(Paths.parse("/home/dir/file.pdf"),
+        Paths.parse("/home/dir/").resolve("file.pdf"));
+  }
+
+  @Test public void resolve_rfc3986() {
+    Path base = Paths.parse("/b/c/d;p");
+    assertEquals(Paths.parse("/b/c/g"), base.resolve("g"));
+    assertEquals(Paths.parse("/b/c/g"), base.resolve("./g"));
+    assertEquals(Paths.parse("/b/c/g/"), base.resolve("g/"));
+    assertEquals(Paths.parse("/g"), base.resolve("/g"));
+    assertEquals(Paths.parse("/b/c/d;p"), base.resolve(""));
+    assertEquals(Paths.parse("/b/c/"), base.resolve("."));
+    assertEquals(Paths.parse("/b/c/"), base.resolve("./"));
+    assertEquals(Paths.parse("/b/"), base.resolve(".."));
+    assertEquals(Paths.parse("/b/"), base.resolve("../"));
+    assertEquals(Paths.parse("/b/g"), base.resolve("../g"));
+    assertEquals(Paths.parse("/"), base.resolve("../.."));
+    assertEquals(Paths.parse("/"), base.resolve("../../"));
+    assertEquals(Paths.parse("/"), base.resolve("../../.."));
+    assertEquals(Paths.parse("/g"), base.resolve("../../../g"));
+    assertEquals(Paths.parse("/g"), base.resolve("/./g"));
+    assertEquals(Paths.parse("/g"), base.resolve("/../g"));
+    assertEquals(Paths.parse("/b/c/g."), base.resolve("g."));
+    assertEquals(Paths.parse("/b/c/.g"), base.resolve(".g"));
+    assertEquals(Paths.parse("/b/c/..g"), base.resolve("..g"));
+    assertEquals(Paths.parse("/b/c/g.."), base.resolve("g.."));
+    assertEquals(Paths.parse("/b/g"), base.resolve("./../g"));
+    assertEquals(Paths.parse("/b/c/g/"), base.resolve("./g/."));
+    assertEquals(Paths.parse("/b/c/g/h"), base.resolve("g/./h"));
+    assertEquals(Paths.parse("/b/c/h"), base.resolve("g/../h"));
+    assertEquals(Paths.parse("/b/c/g;x=1/y"), base.resolve("g;x=1/./y"));
+    assertEquals(Paths.parse("/b/c/y"), base.resolve("g;x=1/../y"));
+  }
 
   @Test public void isEmpty() {
     assertTrue(Paths.empty().isEmpty());
@@ -99,4 +137,5 @@ public class PathTest {
     assertNotEquals(a2.hashCode(), b1.hashCode());
     assertNotEquals(a3.hashCode(), b1.hashCode());
   }
+
 }

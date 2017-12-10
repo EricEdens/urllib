@@ -76,7 +76,7 @@ In the meantime, builds are available on [jitpack](https://jitpack.io/#org.urlli
   - Create a `Url` by parsing.
 - [x] 0.7
   - Utility method to create a `java.net.URI` from a previously-encoded `URL`.
-- [ ] 0.8
+- [x] 0.8
   - Resolve a possibly-relative link against an existing `Url` 
 - [ ] 0.9
   - Utility method to classify a potential URL. Is it junk? A protocol-relative URL? An absolute path?

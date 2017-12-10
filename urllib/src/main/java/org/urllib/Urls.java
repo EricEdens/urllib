@@ -1,8 +1,10 @@
 package org.urllib;
 
+import com.google.auto.value.AutoValue;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import org.urllib.internal.Paths;
 import org.urllib.internal.PercentDecoder;
@@ -206,4 +208,83 @@ public final class Urls {
   }
 
   private Urls() {}
+
+  @AutoValue
+  abstract static class ImmutableUrl implements Url {
+
+    @Nonnegative abstract int defaultPort();
+
+    @Nonnull @Override public Url resolve(String reference) {
+      String sanitized = Strings.sanitizeWhitespace(reference);
+      if (sanitized.isEmpty()) {
+        return this;
+      }
+
+      SplitUrl split = SplitUrl.split(sanitized);
+
+      if (split.urlType() == Type.FULL) {
+        return parse(reference);
+      } else if (split.urlType() == Type.PROTOCOL_RELATIVE) {
+        return parse(scheme() + ':' + reference);
+      }
+
+      UrlBuilder builder = new UrlBuilder(this);
+
+      if (!Strings.isNullOrEmpty(split.path())) {
+        builder.path(path().resolve(split.path()))
+            .query(Queries.empty())
+            .fragment("");
+      }
+
+      if (!Strings.isNullOrEmpty(split.query())) {
+        builder.query(Queries.parse(split.query()))
+            .fragment("");
+      }
+
+      if (!Strings.isNullOrEmpty(split.fragment())) {
+        builder.fragment(PercentDecoder.decodeAll(split.fragment()));
+      }
+
+      return builder.create();
+    }
+
+    @Override @Nonnull public URI uri() {
+      try {
+        return new URI(toString());
+      } catch (URISyntaxException e) {
+        // Reaching this point would mean a bug in our url encoding.
+        throw new AssertionError(
+            "Please file a bug at https://github.com/EricEdens/urllib/issues");
+      }
+    }
+
+    @Override public String toString() {
+      StringBuilder sb = new StringBuilder()
+          .append(scheme())
+          .append("://")
+          .append(host().name());
+
+      if (port() != defaultPort()) {
+        sb.append(':').append(port());
+      }
+
+      sb.append(path().encoded());
+
+      if (!query().isEmpty()) {
+        sb.append('?').append(query().encoded());
+      }
+
+      if (!fragment().isEmpty()) {
+        sb.append('#').append(PercentEncoder.encodeFragment(fragment()));
+      }
+
+      return sb.toString();
+    }
+
+    public static Url create(String scheme, Host host, int port, Path path, Query query,
+        String fragment, int defaultPort) {
+      return new AutoValue_Urls_ImmutableUrl(
+          scheme, host, port, path, query, fragment, defaultPort);
+    }
+  }
 }

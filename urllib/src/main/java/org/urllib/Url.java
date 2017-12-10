@@ -59,4 +59,6 @@ public interface Url {
    * Returns this URL as a {@link java.net.URI}.
    */
   @Nonnull URI uri();
+
+  @Nonnull Url resolve(String reference);
 }

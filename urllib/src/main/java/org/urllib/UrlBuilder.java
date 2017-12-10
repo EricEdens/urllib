@@ -3,10 +3,10 @@ package org.urllib;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import org.urllib.Urls.ImmutableUrl;
 import org.urllib.internal.Paths;
 import org.urllib.internal.Queries;
 import org.urllib.internal.Scheme;
-import org.urllib.internal.UrllibUrl;
 import org.urllib.internal.authority.Authority;
 import org.urllib.internal.authority.Port;
 
@@ -35,6 +35,15 @@ public final class UrlBuilder {
   @Nonnull Path path = Paths.empty();
   @Nonnull Query query = Queries.empty();
   @Nonnull String fragment = "";
+
+  UrlBuilder(Url url) {
+    this.scheme = Scheme.valueOf(url.scheme());
+    this.port = url.port();
+    this.authority = Authority.split(url.host().name());
+    this.path = url.path();
+    this.query = url.query();
+    this.fragment = url.fragment();
+  }
 
   UrlBuilder(@Nonnull Scheme scheme, @Nonnull String host) {
     this.scheme = scheme;
@@ -83,7 +92,7 @@ public final class UrlBuilder {
     if (this.port == -1) {
       this.port = scheme.defaultPort();
     }
-    return UrllibUrl.create(scheme.name(), scheme.defaultPort(), port,
-        authority.host(), path, query, fragment);
+    return ImmutableUrl.create(scheme.name(), authority.host(), port,
+        path, query, fragment, scheme.defaultPort());
   }
 }

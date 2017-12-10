@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.urllib.Path;
 
 public class Paths {
@@ -68,11 +69,19 @@ public class Paths {
     private static final Pattern SINGLE_DOT = Pattern.compile("^\\.|%2[eE]$");
     private static final Pattern DOUBLE_DOT = Pattern.compile("^(\\.|%2[eE]){2}$");
 
-    private final LinkedList<String> segments = new LinkedList<>();
+    private final LinkedList<String> segments;
+    private boolean isDir;
 
-    private boolean isDir = false;
+    PathBuilder() {
+      this(new LinkedList<String>(), false);
+    }
 
-    public PathBuilder splitAndAdd(String segment, boolean decode) {
+    PathBuilder(LinkedList<String> segments, boolean isDir) {
+      this.segments = segments;
+      this.isDir = isDir;
+    }
+
+    PathBuilder splitAndAdd(String segment, boolean decode) {
       if (SLASH_MATCHER.matchesAnyOf(segment)) {
         int i = 0;
         int j = 0;
@@ -131,6 +140,36 @@ public class Paths {
         }
       }
       return sb.toString();
+    }
+
+    @Nonnull @Override public Path resolve(String reference) {
+
+      if (reference.isEmpty()) {
+        return this;
+      }
+
+      loop:
+      for (int i = 0; i < reference.length(); i++) {
+        char c = reference.charAt(i);
+        switch (c) {
+          case ':':
+            throw new IllegalArgumentException(
+                "Paths.resolve can only be used with a relative or absolute path, not a full URL.");
+          case '/':
+          case '\\':
+            if (i == 0) {
+              return parse(reference);
+            } else {
+              break loop;
+            }
+        }
+      }
+
+      LinkedList<String> segments = new LinkedList<>(segments());
+      if (!isDirectory()) {
+        segments.removeLast();
+      }
+      return create(new PathBuilder(segments, true).splitAndAdd(reference, true));
     }
   }
 }

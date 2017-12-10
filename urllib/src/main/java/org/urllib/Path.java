@@ -28,7 +28,6 @@ import javax.annotation.Nonnull;
  */
 public interface Path {
 
-
   /**
    * Returns {@code true} if the path is the root path.
    * <pre>{@code
@@ -72,4 +71,6 @@ public interface Path {
   @Nonnull String filename();
 
   @Nonnull String encoded();
+
+  @Nonnull Path resolve(String ref);
 }

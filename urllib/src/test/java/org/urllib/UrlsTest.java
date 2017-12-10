@@ -15,6 +15,25 @@ import org.urllib.internal.Scheme;
 
 public class UrlsTest {
 
+  @Test public void resolving() {
+    Url base = Urls.parse("http://a/b/c/d;p?q");
+    assertEquals(Urls.parse("http://host"), base.resolve("http://host"));
+    assertEquals(Urls.parse("http://a/path"), base.resolve("/path"));
+    assertEquals(Urls.parse("http://a/b/c/path"), base.resolve("path"));
+    assertEquals(Urls.parse("http://a/b/c/d;p?y"), base.resolve("?y"));
+    assertEquals(Urls.parse("http://a/b/c/g?y"), base.resolve("g?y"));
+    assertEquals(Urls.parse("http://a/b/c/d;p?q#s"), base.resolve("#s"));
+    assertEquals(Urls.parse("http://a/b/c/g#s"), base.resolve("g#s"));
+    assertEquals(Urls.parse("http://a/b/c/g?y#s"), base.resolve("g?y#s"));
+    assertEquals(Urls.parse("http://a/b/c/;x"), base.resolve(";x"));
+    assertEquals(Urls.parse("http://a/b/c/g;x"), base.resolve("g;x"));
+    assertEquals(Urls.parse("http://a/b/c/g;x?y#s"), base.resolve("g;x?y#s"));
+    assertEquals(Urls.parse("http://a/b/c/g?y/./x"), base.resolve("g?y/./x"));
+    assertEquals(Urls.parse("http://a/b/c/g?y/../x"), base.resolve("g?y/../x"));
+    assertEquals(Urls.parse("http://a/b/c/g#s/./x"), base.resolve("g#s/./x"));
+    assertEquals(Urls.parse("http://a/b/c/g#s/../x"), base.resolve("g#s/../x"));
+  }
+
   @Test public void emptyPathIsAlwaysForwardSlash() {
     Url expected = Urls.http("host").path("/").create();
     assertEquals(expected, Urls.http("host").create());
