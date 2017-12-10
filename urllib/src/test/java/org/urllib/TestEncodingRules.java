@@ -36,7 +36,7 @@ public class TestEncodingRules {
     Function<String, String> codepoint = new Function<String, String>() {
       @Override public String apply(String codepoint) {
         Url url = Urls.http("host.com").path("_" + codepoint).create();
-        String path = url.path().toString();
+        String path = url.path().encoded();
         return path.substring(2, path.length());
       }
     };

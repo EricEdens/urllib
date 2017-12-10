@@ -1,13 +1,7 @@
 package org.urllib;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.urllib.internal.CodepointMatcher;
-import org.urllib.internal.PercentDecoder;
-import org.urllib.internal.PercentEncoder;
 
 /**
  * A hierarchical URL component that typically represents a location on a file system.
@@ -32,69 +26,8 @@ import org.urllib.internal.PercentEncoder;
  *   Path.of("/a/", "////b/");
  * }</pre>
  */
-public final class Path {
+public interface Path {
 
-  private static final Path EMPTY = new Path(new PathBuilder());
-
-  @Nonnull private final List<String> segments;
-  private final boolean isDir;
-
-  /**
-   * Creates a {@link Path} by joining {@code segments}.
-   *
-   * <ul>
-   * <li>Backslashes (\) are converted to forward slashes (/)</li>
-   * <li>Segments are then split at the slash character.</li>
-   * <li>Empty path components are removed.</li>
-   * </ul>
-   *
-   * <p>To create a path with a trailing slash, either terminate the last segment with a slash,
-   * or include empty segment as the last segment:
-   *
-   * <pre>{@code
-   *   // Both generate `/path/`:
-   *   Path.of("path/");
-   *   Path.of("path", "");
-   * }</pre>
-   *
-   * <p>The result will always be an absolute path, regardless of whether the first character
-   * is a slash or not.
-   *
-   * <pre>{@code
-   *   // All generate `/path`:
-   *   Path.of("path");
-   *   Path.of("/path");
-   *   Path.of("./path");
-   *   Path.of("../path");
-   * }</pre>
-   */
-  static Path of(String... segments) {
-    if (segments.length == 0) {
-      return EMPTY;
-    }
-
-    PathBuilder pathBuilder = new PathBuilder();
-    for (String segment : segments) {
-      pathBuilder.splitAndAdd(segment, false);
-    }
-
-    return new Path(pathBuilder);
-  }
-
-  static Path parse(String path) {
-    return path.isEmpty()
-        ? EMPTY
-        : new Path(new PathBuilder().splitAndAdd(path, true));
-  }
-
-  static Path empty() {
-    return EMPTY;
-  }
-
-  private Path(PathBuilder pathBuilder) {
-    this.segments = pathBuilder.segments;
-    this.isDir = pathBuilder.isDir;
-  }
 
   /**
    * Returns {@code true} if the path is the root path.
@@ -107,9 +40,7 @@ public final class Path {
    * <p>The first and second example are true, and both equal to each other,
    * since this class enforces that all paths are absolute.
    */
-  public boolean isEmpty() {
-    return segments.isEmpty();
-  }
+  boolean isEmpty();
 
   /**
    * Returns all of the path segments, including the filename (if present). The segments
@@ -123,9 +54,7 @@ public final class Path {
    *   assertEquals(Arrays.asList("a", "b", "c"), Path.of("/a/b/c").segments());
    * }</pre>
    */
-  @Nonnull public List<String> segments() {
-    return segments;
-  }
+  @Nonnull List<String> segments();
 
   /**
    * Returns {@code true} if the path terminates in a forward slash.
@@ -134,87 +63,13 @@ public final class Path {
    *   assertFalse(Path.of("/a").isDirectory());
    * }</pre>
    */
-  public boolean isDirectory() {
-    return isDir;
-  }
+  boolean isDirectory();
 
   /**
    * Returns the path's filename if present, otherwise the empty string. The result will not
    * be percent encoded.
    */
-  @Nonnull public final String filename() {
-    return isDirectory() ? "" : segments().get(segments().size() - 1);
-  }
+  @Nonnull String filename();
 
-  @Nonnull @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder("/");
-    for (Iterator<String> iterator = segments.iterator(); iterator.hasNext(); ) {
-      String segment = iterator.next();
-      sb.append(PercentEncoder.encodePathSegment(segment));
-      if (iterator.hasNext() || isDirectory()) {
-        sb.append('/');
-      }
-    }
-    return sb.toString();
-  }
-
-  @Override public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (o instanceof Path) {
-      Path that = (Path) o;
-      return toString().equals(that.toString());
-    }
-    return false;
-  }
-
-  @Override public int hashCode() {
-    return toString().hashCode();
-  }
-
-  private static class PathBuilder {
-
-    private static final CodepointMatcher SLASH_MATCHER = CodepointMatcher.anyOf("/\\");
-    private static final Pattern SINGLE_DOT = Pattern.compile("^\\.|%2[eE]$");
-    private static final Pattern DOUBLE_DOT = Pattern.compile("^(\\.|%2[eE]){2}$");
-
-    private final LinkedList<String> segments = new LinkedList<>();
-
-    private boolean isDir = false;
-
-    public PathBuilder splitAndAdd(String segment, boolean decode) {
-      if (SLASH_MATCHER.matchesAnyOf(segment)) {
-        int i = 0;
-        int j = 0;
-        for (; j < segment.length(); j++) {
-          if (SLASH_MATCHER.matches(segment.charAt(j))) {
-            add(segment.substring(i, j), decode);
-            i = j + 1;
-          }
-        }
-        return add(segment.substring(i, j), decode);
-      } else {
-        return add(segment, decode);
-      }
-    }
-
-    private PathBuilder add(String segment, boolean decode) {
-      if (segment.isEmpty()) {
-        isDir = true;
-      } else if (SINGLE_DOT.matcher(segment).matches()) {
-        isDir = true;
-      } else if (DOUBLE_DOT.matcher(segment).matches()) {
-        if (!segments.isEmpty()) {
-          segments.removeLast();
-        }
-        isDir = true;
-      } else {
-        segments.add(decode ? PercentDecoder.decodeAll(segment) : segment);
-        isDir = false;
-      }
-      return this;
-    }
-  }
+  @Nonnull String encoded();
 }

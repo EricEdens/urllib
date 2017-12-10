@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import org.junit.Test;
+import org.urllib.internal.Paths;
 import org.urllib.internal.Queries;
 import org.urllib.internal.Scheme;
 
@@ -243,7 +244,7 @@ public class UrlsTest {
   }
 
   @Test public void parseAlwaysReturnsUrlWithPath() {
-    Path expected = Path.empty();
+    Path expected = Paths.empty();
     assertEquals(expected, Urls.parse("http://host.com").path());
     assertEquals(expected, Urls.parse("http://host.com/").path());
     assertEquals(expected, Urls.parse("http://host.com?query").path());
@@ -251,15 +252,15 @@ public class UrlsTest {
   }
 
   @Test public void parseRemovesDotSegmentsInPath() {
-    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/").path());
-    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/.").path());
-    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/c/..").path());
-    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/c/../.").path());
-    assertEquals(Path.of("a/"), Urls.parse("http://host.com/a/b/c/../..").path());
-    assertEquals(Path.of("a/b/file.html"), Urls.parse("http://host.com/a/b/c/../file.html").path());
+    assertEquals(Paths.of("a/b/"), Urls.parse("http://host.com/a/b/").path());
+    assertEquals(Paths.of("a/b/"), Urls.parse("http://host.com/a/b/.").path());
+    assertEquals(Paths.of("a/b/"), Urls.parse("http://host.com/a/b/c/..").path());
+    assertEquals(Paths.of("a/b/"), Urls.parse("http://host.com/a/b/c/../.").path());
+    assertEquals(Paths.of("a/"), Urls.parse("http://host.com/a/b/c/../..").path());
+    assertEquals(Paths.of("a/b/file.html"), Urls.parse("http://host.com/a/b/c/../file.html").path());
 
-    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/%2e").path());
-    assertEquals(Path.of("a/b/"), Urls.parse("http://host.com/a/b/c/%2E%2e").path());
+    assertEquals(Paths.of("a/b/"), Urls.parse("http://host.com/a/b/%2e").path());
+    assertEquals(Paths.of("a/b/"), Urls.parse("http://host.com/a/b/c/%2E%2e").path());
   }
 
   @Test public void parseRemovesEmptyQueryValues() {

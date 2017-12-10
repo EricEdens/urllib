@@ -4,14 +4,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import javax.annotation.Nonnull;
-import org.urllib.internal.Queries;
-import org.urllib.internal.authority.Authority;
+import org.urllib.internal.Paths;
 import org.urllib.internal.PercentDecoder;
 import org.urllib.internal.PercentEncoder;
+import org.urllib.internal.Queries;
 import org.urllib.internal.Scheme;
 import org.urllib.internal.SplitUrl;
 import org.urllib.internal.Strings;
 import org.urllib.internal.Type;
+import org.urllib.internal.authority.Authority;
 
 /**
  * This class consists of {@code static} utility methods for operating
@@ -190,7 +191,7 @@ public final class Urls {
     UrlBuilder builder = new UrlBuilder(Scheme.valueOf(split.scheme()), split.authority());
 
     if (!Strings.isNullOrEmpty(split.path())) {
-      builder.path(Path.parse(split.path()));
+      builder.path(Paths.parse(split.path()));
     }
 
     if (!Strings.isNullOrEmpty(split.query())) {

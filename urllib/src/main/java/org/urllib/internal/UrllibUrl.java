@@ -41,7 +41,7 @@ public abstract class UrllibUrl implements Url {
       sb.append(':').append(port());
     }
 
-    sb.append(path());
+    sb.append(path().encoded());
 
     if (!query().isEmpty()) {
       sb.append('?').append(query().encoded());

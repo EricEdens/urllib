@@ -3,11 +3,12 @@ package org.urllib;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import org.urllib.internal.Paths;
 import org.urllib.internal.Queries;
-import org.urllib.internal.authority.Authority;
-import org.urllib.internal.authority.Port;
 import org.urllib.internal.Scheme;
 import org.urllib.internal.UrllibUrl;
+import org.urllib.internal.authority.Authority;
+import org.urllib.internal.authority.Port;
 
 /**
  * Use the builder to create a {@link Url} from scratch.  For example, this code creates a search
@@ -31,7 +32,7 @@ public final class UrlBuilder {
   @Nonnull final Scheme scheme;
   int port = -1;
   @Nonnull final Authority authority;
-  @Nonnull Path path = Path.empty();
+  @Nonnull Path path = Paths.empty();
   @Nonnull Query query = Queries.empty();
   @Nonnull String fragment = "";
 
@@ -49,7 +50,7 @@ public final class UrlBuilder {
   }
 
   public UrlBuilder path(String... splittableSegments) {
-    this.path = Path.of(splittableSegments);
+    this.path = Paths.of(splittableSegments);
     return this;
   }
 
